@@ -104,7 +104,7 @@ const SignInForm = () => {
             >
               {form.formState.isSubmitting ? "Loading..." : "Login"}
             </Button>
-            <Link href={"/forgot-password"}>
+            <Link href={"#"}>
               <div className="text-primary font-semibold text-left text-[12px] leading-tight -mt-2">
                 <p>Forgot your password?</p>
               </div>
