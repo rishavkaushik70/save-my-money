@@ -1,14 +1,13 @@
 import Image from "next/image";
-import { Badge } from "../ui/badge";
 import { ArrowRight, CircleCheck, HandFist } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import LowerHtw from "./LowerHtw";
+import { Badge } from "@/components/ui/badge";
 
-const HowItWorks = () => {
+const DashboardPreview = () => {
   return (
     <div id="howItWorks">
-      <div className="w-[80%] mx-auto grid grid-cols-2 px-7 py-5 bg-primary/5 mb-10 rounded-md justify-">
+      <div className="w-[80%] mx-auto grid grid-cols-2 px-7 py-5 bg-primary/5 mb-10 rounded-md">
         <div>
           <Image
             src="/Dashboard 2.png"
@@ -70,9 +69,8 @@ const HowItWorks = () => {
           </Link>
         </div>
       </div>
-      <LowerHtw />
     </div>
   );
 };
 
-export default HowItWorks;
+export default DashboardPreview;

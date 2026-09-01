@@ -19,7 +19,7 @@ const Testimonials = () => {
           "SaveMyMoney helped me save ₹12,000 in just one month! The AI insights
           are game-changer."
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-auto">
           <span className="border rounded-full px-2 py-2 bg-primary/20">
             <FaUserAlt className="size-5" />
           </span>
@@ -41,7 +41,7 @@ const Testimonials = () => {
           "The dashboard is beautiful and the AI recommendations are spot on.
           Highly recommended!"
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-auto">
           <span className="border rounded-full px-2 py-2 bg-primary/20">
             <FaUserAlt className="size-5" />
           </span>
@@ -63,7 +63,7 @@ const Testimonials = () => {
           "Finally, a finance app that is easy to use and actually helps me
           understand my spending."
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-auto">
           <span className="border rounded-full px-2 py-2 bg-primary/20">
             <FaUserAlt className="size-5" />
           </span>
@@ -85,7 +85,7 @@ const Testimonials = () => {
           "Best investment I made for my personal finance. Total control in my
           hands."
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-auto">
           <span className="border rounded-full px-2 py-2 bg-primary/20">
             <FaUserAlt className="size-5" />
           </span>

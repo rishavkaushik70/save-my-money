@@ -1,9 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { CircleCheck } from "lucide-react";
-import { Button } from "../ui/button";
 
-const Transactions = () => {
+const Pricing = () => {
   return (
-    <div id="pricing" className="w-6xl mx-auto">
+    <div id="pricing" className="w-[70%] mx-auto">
       <div className="flex flex-col justify-center items-center mb-5">
         <h1 className="text-xl font-bold ">Simple, Transparent Pricing</h1>
         <p className="text-sm font-semibold text-gray-600">
@@ -154,4 +154,4 @@ const Transactions = () => {
   );
 };
 
-export default Transactions;
+export default Pricing;

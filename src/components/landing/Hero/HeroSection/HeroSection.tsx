@@ -2,8 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, SquareArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
+import LowerHeroSection from "./Highlights";
 
-const UpperHeroSection = () => {
+const HeroSection = () => {
   return (
     <div className="flex flex-col items-center relative mx-auto w-6xl">
       <Badge className="bg-primary/10 w-fit text-left text-primary text-sm font-bold py-3 px-5 absolute -top-14 left-56">
@@ -45,4 +46,4 @@ const UpperHeroSection = () => {
   );
 };
 
-export default UpperHeroSection;
+export default HeroSection;

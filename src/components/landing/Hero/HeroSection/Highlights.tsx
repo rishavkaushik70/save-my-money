@@ -1,6 +1,6 @@
 import { Brain, Handshake, ShieldCheck } from "lucide-react";
 
-const LowerHeroSection = () => {
+const Highlights = () => {
   return (
     <div className="w-6xl mt-15 flex justify-around items-center mx-auto">
       <div className="flex gap-2 items-center">
@@ -39,4 +39,4 @@ const LowerHeroSection = () => {
   );
 };
 
-export default LowerHeroSection;
+export default Highlights;

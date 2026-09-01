@@ -28,7 +28,7 @@ const SignInForm = () => {
     });
     console.log(data);
     if (error) {
-      toast.error(error.message || "Invalid email or password");
+      toast.error(error.message || "Invalid Email or Password");
       return;
     }
     toast.success("Login successful!");

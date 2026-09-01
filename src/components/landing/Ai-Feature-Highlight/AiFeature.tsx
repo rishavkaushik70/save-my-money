@@ -7,12 +7,12 @@ import {
   SquareChartGantt,
   Zap,
 } from "lucide-react";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
 import { RiRobot3Fill } from "react-icons/ri";
 
-const LowerHtw = () => {
+const AiFeature = () => {
   return (
-    <div className="grid grid-cols-[40%_60%] w-7xl mx-auto h-100 mb-10">
+    <div className="grid grid-cols-[40%_60%] w-[80%] mx-auto h-100 mb-10">
       <div className="justify-items-start w-[90%] flex flex-col gap-7">
         <Badge className="bg-primary/20 text-primary py-3 px-7 font-bold">
           {" "}
@@ -110,4 +110,4 @@ const LowerHtw = () => {
   );
 };
 
-export default LowerHtw;
+export default AiFeature;
