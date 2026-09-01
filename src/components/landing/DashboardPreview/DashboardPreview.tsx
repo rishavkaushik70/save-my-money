@@ -10,7 +10,7 @@ const DashboardPreview = () => {
       <div className="w-[80%] mx-auto grid grid-cols-2 px-7 py-5 bg-primary/5 mb-10 rounded-md">
         <div>
           <Image
-            src="/Dashboard 2.png"
+            src="/Dashboard 2.PNG"
             alt="Dashboard Preview"
             height={1200}
             width={800}
