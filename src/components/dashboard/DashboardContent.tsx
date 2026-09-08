@@ -7,6 +7,7 @@ import RecentTransaction from "./RecentTransaction/RecentTransaction";
 import ExpensesByCategory from "./ExpensesByCategory/ExpensesByCategory";
 import TipSection from "./TipSection/TipSection";
 import EmptyCard from "./EmptyCard/EmptyCard";
+import { getGoalsPageData } from "@/actions/goalsPage";
 
 type DashboardContentProps = {
   user: User;
@@ -15,6 +16,7 @@ type DashboardContentProps = {
 export default async function DashboardContent({
   user,
 }: DashboardContentProps) {
+  const { hasGoals } = await getGoalsPageData();
   const {
     transactions,
     hasTransaction,
@@ -25,7 +27,7 @@ export default async function DashboardContent({
     expensesByCategory,
   } = await getDashboardData();
 
-  const completedSteps = hasTransaction ? 1 : 0;
+  const completedSteps = (hasTransaction ? 1 : 0) + (hasGoals ? 1 : 0);
   const progress = (completedSteps / 4) * 100;
 
   return (
@@ -46,7 +48,7 @@ export default async function DashboardContent({
           hasTransaction ? "grid-cols-3" : "grid-cols-2"
         }`}
       >
-        <SetupCard hasTransaction={hasTransaction} />
+        <SetupCard hasTransaction={hasTransaction} hasGoals={hasGoals} />
 
         {!hasTransaction && <EmptyCard />}
 

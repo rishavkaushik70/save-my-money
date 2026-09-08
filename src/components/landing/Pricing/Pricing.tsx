@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CircleCheck } from "lucide-react";
+import Link from "next/link";
 
 const Pricing = () => {
   return (
@@ -46,9 +47,11 @@ const Pricing = () => {
             </ul>
           </div>
           <div className="mt-auto">
-            <Button className="bg-white text-primary border-primary/30 border-2 w-full font-semibold mt-10 hover:bg-primary hover:text-white hover:border-none transition-all">
-              Get started
-            </Button>
+            <Link href={"/sign-up"}>
+              <Button className="bg-white text-primary border-primary/30 border-2 w-full font-semibold mt-10 hover:bg-primary hover:text-white hover:border-none transition-all">
+                Get started
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="border-primary border-2 shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col relative hover:scale-102 transition-all">

@@ -10,7 +10,7 @@ import Pricing from "./Pricing/Pricing";
 
 export default function LandingPage() {
   return (
-    <div className="bg-background">
+    <div className="min-h-screen bg-background text-foreground mb-3">
       <Navbar />
 
       <MaxWidthWrapper className="mb-12 mt-28 flex flex-col items-center justify-center text-center sm:mt-40">

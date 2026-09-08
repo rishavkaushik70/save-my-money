@@ -1,6 +1,6 @@
 import TransactionPage from "@/components/transactions/TransactionPage/TransactionPage";
 
-const page = () => {
+const page = async () => {
   return (
     <main>
       <TransactionPage />

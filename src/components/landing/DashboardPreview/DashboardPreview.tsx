@@ -58,7 +58,7 @@ const DashboardPreview = () => {
               </li>
             </ul>
           </div>
-          <Link href={"/"}>
+          <Link href={"/sign-up"}>
             <Button
               className={
                 "mt-3 shadow-md shadow-gray-500 border-none font-semibold hover:bg-primary/80 w-full"

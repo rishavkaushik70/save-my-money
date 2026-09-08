@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, SquareArrowRight, Zap } from "lucide-react";
 import Link from "next/link";
-import LowerHeroSection from "./Highlights";
 
 const HeroSection = () => {
   return (
@@ -24,7 +23,7 @@ const HeroSection = () => {
       </p>
 
       <div className="mt-10 flex gap-30">
-        <Link href={"/"}>
+        <Link href={"/sign-up"}>
           <Button
             className={
               "shadow-md shadow-gray-500 border-none font-semibold hover:bg-primary/80 w-full"
@@ -33,11 +32,8 @@ const HeroSection = () => {
             Start Tracking Free <SquareArrowRight className="size-5" />{" "}
           </Button>
         </Link>
-        <Link href={"/"}>
-          <Button
-            variant={"ghost"}
-            className={"shadow-md shadow-gray-500 font-semibold border-none"}
-          >
+        <Link href={"#howItWorks"}>
+          <Button variant={"outline"} className={"font-semibold shadow-md"}>
             View Demo <ArrowRight />{" "}
           </Button>
         </Link>

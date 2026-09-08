@@ -101,17 +101,13 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
   /* ---------------- FILTER STATES ---------------- */
 
   const [search, setSearch] = useState("");
-
   const [category, setCategory] = useState("ALL");
-
   const [type, setType] = useState("ALL");
-
   const [period, setPeriod] = useState("ALL");
 
   /* ---------------- PAGINATION STATES ---------------- */
 
   const [currentPage, setCurrentPage] = useState(1);
-
   const itemsPerPage = 7;
 
   /* ---------------- FILTER LOGIC ---------------- */
@@ -270,129 +266,139 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
         </TableHeader>
 
         <TableBody>
-          {paginatedTransactions.map((data) => {
-            const config =
-              categoryConfig[data.category as keyof typeof categoryConfig];
+          {paginatedTransactions.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6}>
+                <div className="flex items-center justify-center py-12">
+                  No transactions found!
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : (
+            paginatedTransactions.map((data) => {
+              const config =
+                categoryConfig[data.category as keyof typeof categoryConfig];
 
-            const Icon = config?.icon ?? IndianRupee;
+              const Icon = config?.icon ?? IndianRupee;
 
-            return (
-              <TableRow
-                key={data.id}
-                className="h-16 hover:bg-primary/5 transition-colors"
-              >
-                {/* DATE */}
+              return (
+                <TableRow
+                  key={data.id}
+                  className="h-16 hover:bg-primary/5 transition-colors"
+                >
+                  {/* DATE */}
 
-                <TableCell className="font-medium pl-5 text-gray-500">
-                  {data.date.toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </TableCell>
+                  <TableCell className="font-medium pl-5 text-gray-500">
+                    {data.date.toLocaleDateString("en-IN", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </TableCell>
 
-                {/* TITLE */}
+                  {/* TITLE */}
 
-                <TableCell className="font-bold">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`p-2 rounded-md ${
-                        config?.iconClass ?? "bg-gray-100 text-gray-600"
+                  <TableCell className="font-bold">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`p-2 rounded-md ${
+                          config?.iconClass ?? "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        <Icon className="size-4" />
+                      </div>
+
+                      <div>{data.title}</div>
+                    </div>
+                  </TableCell>
+
+                  {/* CATEGORY */}
+
+                  <TableCell>
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-md text-xs font-semibold ${
+                        config?.badgeClass ?? "bg-gray-100 text-gray-600"
                       }`}
                     >
-                      <Icon className="size-4" />
-                    </div>
+                      {data.category}
+                    </span>
+                  </TableCell>
 
-                    <div>{data.title}</div>
-                  </div>
-                </TableCell>
+                  {/* TYPE */}
 
-                {/* CATEGORY */}
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                        data.type === "INCOME"
+                          ? "text-green-700 bg-green-100"
+                          : "text-red-600 bg-red-100"
+                      }`}
+                    >
+                      <span className="size-1.5 rounded-full bg-current" />
 
-                <TableCell>
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-md text-xs font-semibold ${
-                      config?.badgeClass ?? "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {data.category}
-                  </span>
-                </TableCell>
+                      {data.type === "INCOME" ? "Income" : "Expense"}
+                    </span>
+                  </TableCell>
 
-                {/* TYPE */}
+                  {/* AMOUNT */}
 
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                      data.type === "INCOME"
-                        ? "text-green-700 bg-green-100"
-                        : "text-red-600 bg-red-100"
-                    }`}
-                  >
-                    <span className="size-1.5 rounded-full bg-current" />
+                  <TableCell>
+                    <span
+                      className={`font-semibold ${
+                        data.type === "INCOME" ? "text-primary" : "text-red-500"
+                      }`}
+                    >
+                      {data.type === "INCOME" ? "+" : "-"}₹
+                      {data.amount.toLocaleString("en-IN")}
+                    </span>
+                  </TableCell>
 
-                    {data.type === "INCOME" ? "Income" : "Expense"}
-                  </span>
-                </TableCell>
+                  {/* ACTION */}
 
-                {/* AMOUNT */}
+                  <TableCell className="text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                          >
+                            <EllipsisVertical />
 
-                <TableCell>
-                  <span
-                    className={`font-semibold ${
-                      data.type === "INCOME" ? "text-primary" : "text-red-500"
-                    }`}
-                  >
-                    {data.type === "INCOME" ? "+" : "-"}₹
-                    {data.amount.toLocaleString("en-IN")}
-                  </span>
-                </TableCell>
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        }
+                      />
 
-                {/* ACTION */}
-
-                <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button variant="ghost" size="icon" className="size-8">
-                          <EllipsisVertical />
-
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      }
-                    />
-
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-
-                      <DropdownMenuItem>Duplicate</DropdownMenuItem>
-
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => {
-                          setTransactionToDelete(data);
-                        }}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => {
+                            setTransactionToDelete(data);
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          )}
         </TableBody>
       </Table>
 
       {/* PAGINATION */}
 
-      <TransactionPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {totalPages > 0 && (
+        <TransactionPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
       <AlertDialog
         open={transactionToDelete !== null}
         onOpenChange={(open) => {
@@ -420,21 +426,7 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
             <AlertDialogAction
               className="bg-red-500 hover:bg-red-600"
               disabled={isDeleting}
-              onClick={async (e) => {
-                e.preventDefault();
-
-                if (!transactionToDelete) return;
-
-                setIsDeleting(true);
-
-                const result = await deleteTransaction(transactionToDelete.id);
-
-                if (result.success) {
-                  setTransactionToDelete(null);
-                }
-
-                setIsDeleting(false);
-              }}
+              onClick={handleDelete}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>

@@ -1,11 +1,13 @@
 import { Mail, SquarePlus, Target, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog/add-transaction-dialog";
+import { AddGoalDialog } from "@/components/goals/GoalsDialogbox/Dialogbox";
 
 type RecentTransactionProps = {
   hasTransaction: boolean;
+  hasGoals: boolean;
 };
-const SetupCard = ({ hasTransaction }: RecentTransactionProps) => {
+const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
   return (
     <div className="flex flex-col justify-start gap-7 rounded-md bg-white p-4">
       <div className="flex flex-col gap-3">
@@ -54,13 +56,24 @@ const SetupCard = ({ hasTransaction }: RecentTransactionProps) => {
               </p>
             </div>
           </div>
-          <Button
-            className={
-              "bg-transparent text-primary border border-primary hover:text-white"
-            }
-          >
-            Create Goal
-          </Button>
+          {hasGoals ? (
+            <Button
+              disabled
+              className="bg-transparent text-primary border border-primary"
+            >
+              Completed
+            </Button>
+          ) : (
+            <AddGoalDialog>
+              <Button
+                className={
+                  "bg-transparent text-primary border border-primary hover:text-white"
+                }
+              >
+                Create Goal
+              </Button>
+            </AddGoalDialog>
+          )}
         </div>
         <div className="flex gap-2 px-2 py-3 justify-between items-center border-b">
           <div className="flex gap-3">
