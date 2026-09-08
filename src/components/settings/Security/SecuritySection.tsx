@@ -189,7 +189,7 @@ const SecuritySection = () => {
             </div>
           </div>
 
-          <Button variant="outline">Connected</Button>
+          <Button variant="outline">Connect</Button>
         </div>
 
         {/* GitHub */}

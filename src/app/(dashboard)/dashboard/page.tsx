@@ -8,7 +8,7 @@ export default async function DashboardPage() {
     headers: await headers(),
   });
   if (!session) {
-    redirect("/sign-in");
+    redirect("/");
   }
   return <DashboardContent user={session.user} />;
 }

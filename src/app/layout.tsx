@@ -31,10 +31,6 @@ export const metadata: Metadata = {
 
   applicationName: "SaveMyMoney",
 
-  icons: {
-    icon: "/icon.png",
-  },
-
   openGraph: {
     title: "SaveMyMoney - Smart Personal Finance",
     description:
