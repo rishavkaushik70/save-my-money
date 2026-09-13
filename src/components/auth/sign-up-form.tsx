@@ -48,18 +48,17 @@ export default function SignUpForm() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 rounded-md shadow-md shadow-gray-300 border border-gray-200 pt-5 md:pt-0">
-      <div className="md:bg-primary/5 md:px-10 md:py-7 px-0 py-0">
+      <div className="md:bg-primary/5 md:px-10 md:py-7 px-4 py-4">
         <Link href={"/"}>
           <span className="text-primary text-md font-bold flex gap-2 items-center">
-            {" "}
             <GiWallet className="size-7" /> SaveMyMoney
           </span>
         </Link>
         <div className="flex flex-col md:justify-start md:items-start md:mt-20 mt-5 md:ml-10 justify-center items-center">
-          <h1 className="md:text-7xl text-5xl md:w-[75%] font-bold text-center md:text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-7xl md:w-[75%] font-bold text-center md:text-left">
             Take Control of <span className="text-primary">Your Money</span>
           </h1>
-          <div className="mt-5 text-gray-500 md:text-2xl text-xl md:w-[80%] text-center md:text-left">
+          <div className="mt-3 md:mt-5 text-gray-500 text-base sm:text-xl md:text-2xl md:w-[80%] text-center md:text-left">
             Track expenses, set budgets, and achieve your financial goals with
             clarity.
           </div>
@@ -120,7 +119,7 @@ export default function SignUpForm() {
         </div>
       </div>
       <div className="w-[90%] mx-auto md:hidden border mt-5"></div>
-      <div className="px-9 md:py-10 py-5 md:bg-white rounded-r-md">
+      <div className="px-4 sm:px-9 md:py-10 py-6 md:bg-white rounded-r-md">
         <div className="mx-auto w-full text-center">
           <h1 className="font-bold text-2xl mb-1">Create your account</h1>
           <p className="text-gray-500 mb-10 text-sm">
@@ -236,22 +235,22 @@ export default function SignUpForm() {
               or continue with
             </div>
           </div>
-          <div className="flex justify-around items-center gap-3 md:gap-0">
-            <Link href={"/"}>
-              <Button className="md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                <img src="/google.svg" alt="" className="size-4" />
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 md:flex md:justify-around md:gap-0 w-full">
+            <Link href={"/"} className="w-full md:w-auto">
+              <Button className="w-full md:w-auto md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                <img src="/google.svg" alt="" className="size-4 shrink-0" />
                 <span className="font-semibold">Google</span>
               </Button>
             </Link>
-            <Link href={"/"}>
-              <Button className="md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                <img src="/github.svg" alt="" className="size-4" />
+            <Link href={"/"} className="w-full md:w-auto">
+              <Button className="w-full md:w-auto md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                <img src="/github.svg" alt="" className="size-4 shrink-0" />
                 <span className="font-semibold">GitHub</span>
               </Button>
             </Link>
-            <Link href={"/"}>
-              <Button className="md:px-9 px-3 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                <img src="/apple.svg" alt="" className="size-4" />
+            <Link href={"/"} className="w-full md:w-auto">
+              <Button className="w-full md:w-auto md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                <img src="/apple.svg" alt="" className="size-4 shrink-0" />
                 <span className="font-semibold">Apple</span>
               </Button>
             </Link>

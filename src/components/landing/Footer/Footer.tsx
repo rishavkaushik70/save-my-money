@@ -6,25 +6,24 @@ import { FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <div className="w-[95%] mx-auto flex px-20 border rounded-md bg-gray-200/30 border-gray-50">
-      <div className="flex flex-col w-[20%] gap-2 py-3">
+    <div className="w-[95%] mx-auto flex flex-col md:flex-row px-6 md:px-20 py-8 md:py-0 border rounded-md bg-gray-200/30 border-gray-50 gap-8 md:gap-0">
+      <div className="flex flex-col w-full md:w-[20%] gap-2 py-3">
         <div>
           <span className="text-primary text-sm font-bold flex gap-2 items-center">
-            {" "}
-            <Bot className="size-10 -rotate-7" /> SaveMyMoney
+            <Bot className="size-8 md:size-10 -rotate-7" /> SaveMyMoney
           </span>
         </div>
-        <div className="text-[12px] text-gray-500 font-semibold w-[70%]">
-          AI powererd personal finance management for a better future.
+        <div className="text-[12px] text-gray-500 font-semibold w-full md:w-[70%]">
+          AI powered personal finance management for a better future.
         </div>
-        <div className="flex gap-3 text-xl w-fit cursor-pointer">
+        <div className="flex gap-3 text-xl w-fit cursor-pointer mt-2">
           <FaSquareTwitter className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
           <FaSquareInstagram className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
           <FaGithub className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
           <FaLinkedin className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
         </div>
       </div>
-      <div className="flex flex-col w-[20%] py-3">
+      <div className="flex flex-col w-full md:w-[20%] py-3">
         <ul>
           <li className="font-bold mb-2">Product</li>
           <li className="text-gray-500 text-sm">Features</li>
@@ -33,7 +32,7 @@ const Footer = () => {
           <li className="text-gray-500 text-sm">Changelog</li>
         </ul>
       </div>
-      <div className="flex flex-col w-[20%] py-3">
+      <div className="flex flex-col w-full md:w-[20%] py-3">
         <ul>
           <li className="font-bold mb-2">Company</li>
           <li className="text-gray-500 text-sm">About us</li>
@@ -42,7 +41,7 @@ const Footer = () => {
           <li className="text-gray-500 text-sm">Contact</li>
         </ul>
       </div>
-      <div className="flex flex-col w-[20%] py-3">
+      <div className="flex flex-col w-full md:w-[20%] py-3">
         <ul>
           <li className="font-bold mb-2">Support</li>
           <li className="text-gray-500 text-sm">Help center</li>
@@ -51,7 +50,7 @@ const Footer = () => {
           <li className="text-gray-500 text-sm">FAQs</li>
         </ul>
       </div>
-      <div className="flex flex-col w-[20%] py-3">
+      <div className="flex flex-col w-full md:w-[20%] py-3">
         <p className="font-bold mb-2">Stay Updated</p>
         <p className="text-gray-500 text-sm">
           Get tips on saving money and financial management

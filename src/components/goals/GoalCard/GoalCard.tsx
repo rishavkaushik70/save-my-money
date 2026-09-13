@@ -42,22 +42,22 @@ const GoalCard = ({ goal }: GoalCardProps) => {
     toast.success(result.message);
   };
   return (
-    <div className="bg-white rounded-md p-5 flex flex-col gap-8">
+    <div className="bg-white rounded-md p-4 sm:p-5 flex flex-col gap-6 sm:gap-8">
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4 min-w-0">
+        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <span
-            className={`rounded-md flex justify-center items-center shrink-0 size-25 ${
+            className={`rounded-md flex justify-center items-center shrink-0 size-16 sm:size-20 md:size-25 ${
               category?.bgColor ?? "bg-gray-100"
             }`}
           >
             <Icon
-              className={`size-12 ${category?.iconColor ?? "text-gray-600"}`}
+              className={`size-8 sm:size-10 md:size-12 ${category?.iconColor ?? "text-gray-600"}`}
             />
           </span>
 
-          <div className="min-w-0 pt-2">
+          <div className="min-w-0 pt-1 sm:pt-2">
             <h1
-              className="font-bold text-2xl truncate"
+              className="font-bold text-xl sm:text-2xl truncate"
               title={goal.title ?? ""}
             >
               {goal.title}
@@ -108,13 +108,13 @@ const GoalCard = ({ goal }: GoalCardProps) => {
           <span className="text-sm font-semibold">{Math.round(progress)}%</span>
         </div>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 sm:gap-0">
         <span className="font-bold flex items-center gap-1">
           ₹{remainingAmount.toLocaleString("en-IN")}
           <span className="text-gray-500 text-sm">remaining</span>
         </span>
-        <div className="flex items-center gap-1 text-sm">
-          <Calendar className="size-4 text-gray-800" />
+        <div className="flex items-center gap-1 text-sm text-gray-600">
+          <Calendar className="size-4 text-gray-800 shrink-0" />
           <span>
             Due:{" "}
             {goal.deadline

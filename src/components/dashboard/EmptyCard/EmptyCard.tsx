@@ -5,13 +5,13 @@ import { AddTransactionDialog } from "@/components/transactions/AddTransactionDi
 
 const EmptyCard = () => {
   return (
-    <div className="h-full bg-white flex justify-center items-center rounded-md flex-col gap-3">
+    <div className="h-full bg-white flex justify-center items-center rounded-md flex-col gap-3 p-6">
       <div>
         <Image src={"/sorry.svg"} height={200} width={200} alt="Sorry Gif" />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 items-center">
         <h1 className="text-2xl font-bold text-center">Nothing to show yet</h1>
-        <p className="text-gray-500 w-sm text-sm">
+        <p className="text-gray-500 w-full max-w-sm px-2 text-center text-sm">
           Add your first transaction to see your balance, reports, and insight
           here
         </p>

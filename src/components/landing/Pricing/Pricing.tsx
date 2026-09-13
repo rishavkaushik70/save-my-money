@@ -4,14 +4,14 @@ import Link from "next/link";
 
 const Pricing = () => {
   return (
-    <div id="pricing" className="w-[70%] mx-auto">
+    <div id="pricing" className="w-[92%] sm:w-[85%] md:w-[70%] mx-auto">
       <div className="flex flex-col justify-center items-center mb-5">
         <h1 className="text-xl font-bold ">Simple, Transparent Pricing</h1>
         <p className="text-sm font-semibold text-gray-600">
           Choose the plan that works for you
         </p>
       </div>
-      <div className="grid grid-cols-3 gap-3 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-3 items-stretch">
         <div className="border shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col h-full hover:scale-102 transition-all">
           <h2 className="font-extrabold text-2xl mb-3">Free</h2>
           <div>
@@ -55,7 +55,7 @@ const Pricing = () => {
           </div>
         </div>
         <div className="border-primary border-2 shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col relative hover:scale-102 transition-all">
-          <div className="rounded-full w-fit py-1 px-10 text-white bg-primary text-sm font-bold absolute -top-4 left-24">
+          <div className="rounded-full w-fit py-1 px-10 text-white bg-primary text-sm font-bold absolute -top-4 left-1/2 -translate-x-1/2 md:left-24 md:translate-x-0">
             Most popular
           </div>
           <h2 className="font-semibold text-2xl mb-3 text-primary">Pro</h2>

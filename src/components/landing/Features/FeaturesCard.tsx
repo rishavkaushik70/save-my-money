@@ -9,8 +9,8 @@ import {
 
 const FeaturesCard = () => {
   return (
-    <div className="w-7xl grid grid-cols-6 gap-5 mt-3 mx-auto">
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+    <div className="w-full max-w-7xl md:w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-5 mt-3 mx-auto px-4 md:px-0 justify-items-center">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <ChartNoAxesColumn className="text-primary" />
         </span>
@@ -19,7 +19,7 @@ const FeaturesCard = () => {
           Visualise your spending patterns with beautiful dashboard and charts
         </p>
       </div>
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <Brain className="text-primary" />
         </span>
@@ -28,7 +28,7 @@ const FeaturesCard = () => {
           Get personalized tips and recommendations powered by AI.
         </p>
       </div>
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@ const FeaturesCard = () => {
           goals.
         </p>
       </div>
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <CreditCard className="text-primary" />
         </span>
@@ -66,7 +66,7 @@ const FeaturesCard = () => {
           Track all your subcriptions and never miss a payment.
         </p>
       </div>
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <ChartCandlestick className="text-primary" />
         </span>
@@ -75,7 +75,7 @@ const FeaturesCard = () => {
           Monitor your investments and get smart insights to grow wealth.
         </p>
       </div>
-      <div className="max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border">
+      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
         <span className="border px-3 py-3 rounded-md  bg-primary/10">
           <ShieldCheck className="text-primary" />
         </span>

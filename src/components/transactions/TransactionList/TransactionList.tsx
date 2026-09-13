@@ -23,7 +23,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -43,7 +42,7 @@ import {
 
 import { Transaction } from "@/generated/prisma/client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import TransactionFilters from "../TransactionFilters/TransactionFilters";
 import TransactionPagination from "../TransactionPagination/TransactionPagination";
@@ -189,9 +188,25 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
 
   /* ---------------- RESET PAGE ON FILTER CHANGE ---------------- */
 
-  useEffect(() => {
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
     setCurrentPage(1);
-  }, [search, category, type, period]);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setCurrentPage(1);
+  };
+
+  const handleTypeChange = (value: string) => {
+    setType(value);
+    setCurrentPage(1);
+  };
+
+  const handlePeriodChange = (value: string) => {
+    setPeriod(value);
+    setCurrentPage(1);
+  };
 
   /* ---------------- PAGINATION CALCULATIONS ---------------- */
 
@@ -237,18 +252,18 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
 
       <TransactionFilters
         search={search}
-        setSearch={setSearch}
+        setSearch={handleSearchChange}
         category={category}
-        setCategory={setCategory}
+        setCategory={handleCategoryChange}
         type={type}
-        setType={setType}
+        setType={handleTypeChange}
         period={period}
-        setPeriod={setPeriod}
+        setPeriod={handlePeriodChange}
       />
 
       {/* TABLE */}
 
-      <Table>
+      <Table className="min-w-[640px]">
         <TableHeader className="bg-gray-100/80">
           <TableRow className="h-16">
             <TableHead className="font-bold pl-5">Date</TableHead>

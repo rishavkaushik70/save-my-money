@@ -2,7 +2,7 @@ import { Brain, Handshake, ShieldCheck } from "lucide-react";
 
 const Highlights = () => {
   return (
-    <div className="w-6xl mt-15 flex justify-around items-center mx-auto">
+    <div className="w-full max-w-6xl md:w-6xl mt-10 md:mt-15 flex flex-col sm:flex-row gap-6 md:gap-0 justify-around items-start sm:items-center mx-auto px-6 md:px-0">
       <div className="flex gap-2 items-center">
         <span>
           <ShieldCheck className="text-primary size-9" />

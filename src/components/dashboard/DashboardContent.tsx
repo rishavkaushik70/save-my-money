@@ -31,7 +31,7 @@ export default async function DashboardContent({
   const progress = (completedSteps / 4) * 100;
 
   return (
-    <main className="w-full bg-gray-100 px-10 pt-10 flex flex-col gap-6 pb-1 min-h-[calc(100vh-68px)]">
+    <main className="w-full bg-gray-100 px-4 pt-6 md:px-10 md:pt-10 flex flex-col gap-6 pb-6 md:pb-1 min-h-[calc(100vh-68px)]">
       <WelcomeCard user={user} progress={progress} />
 
       {hasTransaction && (
@@ -45,7 +45,7 @@ export default async function DashboardContent({
 
       <div
         className={`grid gap-4 ${
-          hasTransaction ? "grid-cols-3" : "grid-cols-2"
+          hasTransaction ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
         }`}
       >
         <SetupCard hasTransaction={hasTransaction} hasGoals={hasGoals} />

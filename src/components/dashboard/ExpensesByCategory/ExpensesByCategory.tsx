@@ -69,7 +69,7 @@ const ExpensesByCategory = ({
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-2 gap-2 mt-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-2 mt-5">
         <div className="h-full">
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>

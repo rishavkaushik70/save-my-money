@@ -17,9 +17,9 @@ const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
         </p>
       </div>
       <div className="border rounded-md">
-        <div className="flex gap-2 px-2 py-3 justify-between border-b items-center">
-          <div className="flex gap-3">
-            <span className="px-2 py-2 bg-primary/10 text-primary rounded-md flex items-center justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 px-3 py-3 justify-between border-b items-start sm:items-center">
+          <div className="flex gap-3 items-center">
+            <span className="px-2 py-2 bg-primary/10 text-primary rounded-md flex items-center justify-center shrink-0">
               <SquarePlus />
             </span>
             <div>
@@ -29,24 +29,27 @@ const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
               </p>
             </div>
           </div>
-          {hasTransaction ? (
-            <Button
-              disabled
-              className="bg-transparent text-primary border border-primary"
-            >
-              Completed
-            </Button>
-          ) : (
-            <AddTransactionDialog>
-              <Button className="bg-transparent text-primary border border-primary hover:text-white">
-                Add Now
+          <div className="self-end sm:self-auto shrink-0">
+            {hasTransaction ? (
+              <Button
+                disabled
+                className="bg-transparent text-primary border border-primary"
+              >
+                Completed
               </Button>
-            </AddTransactionDialog>
-          )}
+            ) : (
+              <AddTransactionDialog>
+                <Button className="bg-transparent text-primary border border-primary hover:text-white">
+                  Add Now
+                </Button>
+              </AddTransactionDialog>
+            )}
+          </div>
         </div>
-        <div className="flex gap-2 px-2 py-3 justify-between border-b items-center">
-          <div className="flex gap-3">
-            <span className="px-2 py-2 bg-blue-500/20 text-blue-500 rounded-md flex items-center justify-center">
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 px-3 py-3 justify-between border-b items-start sm:items-center">
+          <div className="flex gap-3 items-center">
+            <span className="px-2 py-2 bg-blue-500/20 text-blue-500 rounded-md flex items-center justify-center shrink-0">
               <Target />
             </span>
             <div>
@@ -56,28 +59,31 @@ const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
               </p>
             </div>
           </div>
-          {hasGoals ? (
-            <Button
-              disabled
-              className="bg-transparent text-primary border border-primary"
-            >
-              Completed
-            </Button>
-          ) : (
-            <AddGoalDialog>
+          <div className="self-end sm:self-auto shrink-0">
+            {hasGoals ? (
               <Button
-                className={
-                  "bg-transparent text-primary border border-primary hover:text-white"
-                }
+                disabled
+                className="bg-transparent text-primary border border-primary"
               >
-                Create Goal
+                Completed
               </Button>
-            </AddGoalDialog>
-          )}
+            ) : (
+              <AddGoalDialog>
+                <Button
+                  className={
+                    "bg-transparent text-primary border border-primary hover:text-white"
+                  }
+                >
+                  Create Goal
+                </Button>
+              </AddGoalDialog>
+            )}
+          </div>
         </div>
-        <div className="flex gap-2 px-2 py-3 justify-between items-center border-b">
-          <div className="flex gap-3">
-            <span className="px-2 py-2 bg-yellow-400/30 text-yellow-600 border-b rounded-md flex items-center justify-center">
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 px-3 py-3 justify-between border-b items-start sm:items-center">
+          <div className="flex gap-3 items-center">
+            <span className="px-2 py-2 bg-yellow-400/30 text-yellow-600 border-b rounded-md flex items-center justify-center shrink-0">
               <User />
             </span>
             <div>
@@ -87,17 +93,20 @@ const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
               </p>
             </div>
           </div>
-          <Button
-            className={
-              "bg-transparent text-primary border border-primary hover:text-white"
-            }
-          >
-            Complete
-          </Button>
+          <div className="self-end sm:self-auto shrink-0">
+            <Button
+              className={
+                "bg-transparent text-primary border border-primary hover:text-white"
+              }
+            >
+              Complete
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2 px-2 py-3 justify-between items-center">
-          <div className="flex gap-3">
-            <span className="px-2 py-2 bg-purple-300/40 text-purple-500 rounded-md flex items-center justify-center">
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 px-3 py-3 justify-between items-start sm:items-center">
+          <div className="flex gap-3 items-center">
+            <span className="px-2 py-2 bg-purple-300/40 text-purple-500 rounded-md flex items-center justify-center shrink-0">
               <Mail />
             </span>
             <div>
@@ -107,13 +116,15 @@ const SetupCard = ({ hasTransaction, hasGoals }: RecentTransactionProps) => {
               </p>
             </div>
           </div>
-          <Button
-            className={
-              "bg-transparent text-primary border border-primary hover:text-white"
-            }
-          >
-            Verify Now
-          </Button>
+          <div className="self-end sm:self-auto shrink-0">
+            <Button
+              className={
+                "bg-transparent text-primary border border-primary hover:text-white"
+              }
+            >
+              Verify Now
+            </Button>
+          </div>
         </div>
       </div>
     </div>

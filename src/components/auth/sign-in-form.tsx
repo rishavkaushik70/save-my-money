@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { SignInSchema, signInSchema } from "@/lib/validators/auth";
-import { LockKeyhole, Mail, User } from "lucide-react";
+import { LockKeyhole, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -36,18 +36,18 @@ const SignInForm = () => {
     router.replace("/dashboard");
   };
   return (
-    <div className="flex flex-col items-center justify-center px-5 md:px-0">
-      <div className="bg-white w-full shadow-md shadow-gray-200 flex flex-col justify-center items-center px-10 py-10 rounded-md">
+    <div className="flex flex-col items-center justify-center px-4 md:px-0 w-full max-w-md mx-auto">
+      <div className="bg-white w-full shadow-md shadow-gray-200 flex flex-col justify-center items-center px-5 sm:px-10 py-8 sm:py-10 rounded-md">
         <div className="text-primary border rounded-full bg-primary/10 px-2 py-2 mb-5">
           <Lock className="size-6" />
         </div>
-        <div className="mb-10">
+        <div className="mb-8 sm:mb-10 text-center">
           <h1 className="text-center text-2xl font-bold">Welcome Back</h1>
           <p className="text-gray-500 text-sm">
             Sign in to continue to your account
           </p>
         </div>
-        <div>
+        <div className="w-full">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {/* Email */}
             <div className="space-y-2">
@@ -114,28 +114,28 @@ const SignInForm = () => {
                 or continue with
               </div>
             </div>
-            <div className="flex justify-around items-center gap-3 md:gap-3">
-              <Link href={"/"}>
-                <Button className="md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                  <img src="/google.svg" alt="" className="size-4" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full">
+              <Link href={"/"} className="w-full">
+                <Button className="w-full md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                  <img src="/google.svg" alt="" className="size-4 shrink-0" />
                   <span className="font-semibold">Google</span>
                 </Button>
               </Link>
-              <Link href={"/"}>
-                <Button className="md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                  <img src="/github.svg" alt="" className="size-4" />
+              <Link href={"/"} className="w-full">
+                <Button className="w-full md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                  <img src="/github.svg" alt="" className="size-4 shrink-0" />
                   <span className="font-semibold">GitHub</span>
                 </Button>
               </Link>
-              <Link href={"/sign-in"}>
-                <Button className="md:px-9 px-3 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-3 hover:bg-primary/10">
-                  <img src="/apple.svg" alt="" className="size-4" />
+              <Link href={"/sign-in"} className="w-full">
+                <Button className="w-full md:px-9 px-2 bg-transparent text-black border border-gray-200 flex justify-center items-center gap-1.5 sm:gap-3 hover:bg-primary/10 text-xs sm:text-sm">
+                  <img src="/apple.svg" alt="" className="size-4 shrink-0" />
                   <span className="font-semibold">Apple</span>
                 </Button>
               </Link>
             </div>
             <p className="text-sm text-center text-gray-500">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href={"/sign-up"}>
                 <span className="text-primary font-semibold">Sign up</span>
               </Link>

@@ -7,30 +7,30 @@ import { Badge } from "@/components/ui/badge";
 const DashboardPreview = () => {
   return (
     <div id="howItWorks">
-      <div className="w-[80%] mx-auto grid grid-cols-2 px-7 py-5 bg-primary/5 mb-10 rounded-md">
+      <div className="w-[92%] sm:w-[90%] md:w-[80%] mx-auto grid grid-cols-1 md:grid-cols-2 px-4 sm:px-7 py-6 md:py-5 bg-primary/5 mb-10 rounded-md gap-6 md:gap-0">
         <div>
           <Image
             src="/Dashboard 2.PNG"
             alt="Dashboard Preview"
             height={1200}
             width={800}
-            className="shadow-md shadow-gray-300 rounded-md"
+            className="shadow-md shadow-gray-300 rounded-md w-full h-auto"
           ></Image>
         </div>
-        <div className="ml-15 flex flex-col items-start gap-5">
-          <span className="mt-3">
+        <div className="ml-0 md:ml-15 flex flex-col items-start gap-5">
+          <span className="mt-1 md:mt-3">
             <Badge className="bg-primary/9 text-primary px-3 font-bold">
               <HandFist />
               Powerful Dashboard
             </Badge>
           </span>
-          <div className="">
-            <h1 className="text-4xl font-extrabold">All Your Finances.</h1>
-            <h1 className="text-4xl font-extrabold">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold">All Your Finances.</h1>
+            <h1 className="text-3xl sm:text-4xl font-extrabold">
               One Beautiful Dashboard.
             </h1>
           </div>
-          <div className="text-gray-500 font-semibold w-[70%]">
+          <div className="text-gray-500 font-semibold w-full md:w-[70%]">
             <p>Get a complete overview of your financial health.</p>
             <p>Track income, expenses, budget, goals and more in real time.</p>
           </div>
