@@ -116,7 +116,9 @@ const GoalCard = ({ goal }: GoalCardProps) => {
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1.5 sm:gap-0">
         <span className="font-bold flex items-center gap-1 text-sm sm:text-base">
           ₹{remainingAmount.toLocaleString("en-IN")}
-          <span className="text-gray-500 text-xs sm:text-sm font-normal">remaining</span>
+          <span className="text-gray-500 text-xs sm:text-sm font-normal">
+            remaining
+          </span>
         </span>
         <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600">
           <Calendar className="size-3.5 sm:size-4 text-gray-700 shrink-0" />
@@ -135,7 +137,9 @@ const GoalCard = ({ goal }: GoalCardProps) => {
 
       {isCompleted ? (
         <div className="w-full rounded-md bg-primary/10 border border-primary/20 py-2.5 px-3 text-center mt-auto">
-          <p className="font-semibold text-primary text-sm sm:text-base">🥳 Goal Completed!</p>
+          <p className="font-semibold text-primary text-sm sm:text-base">
+            🥳 Goal Completed!
+          </p>
           <p className="text-xs sm:text-sm text-gray-500">
             You made it happen. Keep going!
           </p>
