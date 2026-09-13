@@ -62,7 +62,7 @@ const AddMoneyDialog = ({
             variant="outline"
             size="sm"
             className={
-              "hover:bg-primary hover:text-white transition-all mt-auto"
+              "w-full sm:w-auto hover:bg-primary hover:text-white transition-all mt-auto"
             }
           >
             <Plus className="size-4" />
@@ -128,11 +128,18 @@ const AddMoneyDialog = ({
         </div>
 
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">Cancel</Button>} />
+          <DialogClose
+            render={
+              <Button variant="outline" className="w-full sm:w-auto">
+                Cancel
+              </Button>
+            }
+          />
 
           <Button
             onClick={handleAddMoney}
             disabled={!amount || Number(amount) <= 0}
+            className="w-full sm:w-auto"
           >
             Add Money
           </Button>

@@ -113,8 +113,9 @@ const AddGoalForm = () => {
           )}
         </Field>
         <Field>
-          <Label htmlFor="username-1">Target Date</Label>
+          <Label htmlFor="deadline">Target Date</Label>
           <Input
+            id="deadline"
             type="date"
             min={new Date().toISOString().split("T")[0]}
             {...form.register("deadline", {
@@ -123,8 +124,9 @@ const AddGoalForm = () => {
           />
         </Field>
         <Field>
-          <Label htmlFor="username-1">Description (Optional)</Label>
+          <Label htmlFor="description">Description (Optional)</Label>
           <Textarea
+            id="description"
             placeholder="Add a short description (Optional)"
             className="resize-none"
             {...form.register("description")}
@@ -139,13 +141,21 @@ const AddGoalForm = () => {
       <DialogFooter className="mt-5">
         <DialogClose
           render={
-            <Button variant="outline" disabled={form.formState.isSubmitting}>
+            <Button
+              variant="outline"
+              disabled={form.formState.isSubmitting}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
           }
         />
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="w-full sm:w-auto"
+        >
           {form.formState.isSubmitting ? "Saving..." : "Save Goal"}
         </Button>
       </DialogFooter>
