@@ -1,33 +1,107 @@
-# save-my-money
+# SaveMyMoney 💰
 
-AI-powered personal finance SaaS built with Next.js, TypeScript, Prisma and Stripe.
+An AI-powered personal finance SaaS built with Next.js, TypeScript, Prisma and PostgreSQL.
 
-# SaveMyMoney
+SaveMyMoney helps users manage their finances by tracking income and expenses, setting financial goals, monitoring spending, and understanding their financial activity through a clean and responsive dashboard.
 
-An AI-powered personal finance SaaS that helps users manage their money, track expenses, monitor budgets, and receive intelligent financial insights.
+##  Live Demo
 
-## Tech Stack
+🔗 **Live App:** [https://savemymoneylive.vercel.app/]
 
-- Next.js
+
+---
+
+## ✨ Features
+
+- 🔐 Secure user authentication
+- 📊 Personal finance dashboard
+- 💰 Income tracking
+- 💸 Expense tracking
+- 🧾 Transaction management
+- 🎯 Financial goals
+- 📈 Expense categories and reports
+- ⚙️ User settings
+- 📱 Responsive design
+- ⏳ Loading and skeleton states
+- 🧩 Reusable UI components
+- ✅ Form validation
+- 🛡️ Protected dashboard routes
+
+---
+
+## 🧠 AI-Powered Finance Experience
+
+SaveMyMoney is designed to make personal finance management easier by combining traditional finance tracking with AI-powered insights.
+
+The goal is to help users better understand their financial activity and make more informed decisions based on their data.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- Next.js 16
+- React 19
 - TypeScript
-- Tailwind CSS
-- Prisma
+- Tailwind CSS v4
+- shadcn/ui
+- Lucide Icons
+
+### Backend & Database
+
+- Next.js Server Actions
+- Prisma ORM
 - PostgreSQL
-- Stripe
-- AI Integration
+- Neon PostgreSQL
 
-## Planned Features
+### Authentication
 
-- Authentication
-- Financial Dashboard
-- Income & Expense Tracking
-- Budget Management
-- Savings Goals
-- AI Financial Assistant
-- Charts & Analytics
-- Subscription Plans
-- Responsive Design
+- Better Auth
 
-This project is currently under development.
+### Forms & Validation
 
-> > > > > > > 243da4f003e52dd6fe445632a322e617b5ce36ee
+- React Hook Form
+- Zod
+
+### Development Tools
+
+- Git
+- GitHub
+- VS Code
+- Vercel
+
+---
+
+## 📂 Project Structure
+
+```text
+save-my-money/
+│
+├── app/
+│   ├── (dashboard)/
+│   ├── auth/
+│   ├── api/
+│   └── ...
+│
+├── components/
+│   ├── auth/
+│   ├── dashboard/
+│   ├── goals/
+│   ├── landing/
+│   ├── layout/
+│   ├── settings/
+│   ├── transactions/
+│   └── ui/
+│
+├── actions/
+│   ├── dashboard/
+│   ├── goals/
+│   └── transactions/
+│
+├── prisma/
+│   └── schema.prisma
+│
+├── lib/
+├── types/
+└── public/
