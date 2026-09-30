@@ -73,6 +73,10 @@ The goal is to help users better understand their financial activity and make mo
 
 ---
 
+## 🔮 Future Improvements
+
+- AI-powered financial assistant
+- AI financial insights
 ## 📂 Project Structure
 
 ```text
