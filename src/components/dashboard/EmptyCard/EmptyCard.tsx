@@ -5,23 +5,22 @@ import { AddTransactionDialog } from "@/components/transactions/AddTransactionDi
 
 const EmptyCard = () => {
   return (
-    <div className="h-full bg-white flex justify-center items-center rounded-md flex-col gap-3 p-6">
-      <div>
-        <Image src={"/sorry.svg"} height={200} width={200} alt="Sorry Gif" />
+    <section className="flex min-w-0 min-h-[360px] h-full flex-col items-center justify-center gap-4 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-emerald-50/70 p-6 text-center shadow-sm sm:p-8">
+      <div className="rounded-3xl bg-white p-3 shadow-sm ring-1 ring-emerald-100">
+        <Image src="/sorry.svg" height={150} width={150} alt="" aria-hidden="true" />
       </div>
-      <div className="flex flex-col gap-2 items-center">
-        <h1 className="text-2xl font-bold text-center">Nothing to show yet</h1>
-        <p className="text-gray-500 w-full max-w-sm px-2 text-center text-sm">
-          Add your first transaction to see your balance, reports, and insight
-          here
+      <div className="flex min-w-0 flex-col items-center gap-2">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Nothing to show yet</h2>
+        <p className="w-full max-w-sm text-sm leading-6 text-slate-600">
+          Add your first transaction to see your balance, reports, and insights here.
         </p>
       </div>
       <AddTransactionDialog>
-        <Button className={"text-white"}>
+        <Button className="mt-1 rounded-xl px-5 text-white shadow-sm">
           <Plus /> Add transaction
         </Button>
       </AddTransactionDialog>
-    </div>
+    </section>
   );
 };
 

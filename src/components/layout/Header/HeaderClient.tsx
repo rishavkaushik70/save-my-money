@@ -14,48 +14,48 @@ import {
   X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+import { logout } from "@/actions/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useState } from "react";
 import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog/add-transaction-dialog";
-import { logout } from "@/actions/auth";
+import { usePersonalSettings } from "@/components/settings/SettingsProvider";
 
-const pageTitles = {
-  dashboard: "Dashboard",
-  transaction: "Transaction",
-  goals: "Goals",
-  categories: "Categories",
-  reports: "Reports",
-  settings: "Settings",
+const pageDetails: Record<string, { title: string; description: string }> = {
+  dashboard: {
+    title: "Dashboard",
+    description: "Your money, organized at a glance.",
+  },
+  transaction: {
+    title: "Transactions",
+    description: "Track and manage your income and expenses.",
+  },
+  goals: {
+    title: "Goals",
+    description: "Small steps toward your next money goal.",
+  },
+  categories: {
+    title: "Categories",
+    description: "Organize spending in a way that makes sense.",
+  },
+  reports: {
+    title: "Reports",
+    description: "Understand where your money goes.",
+  },
+  settings: {
+    title: "Settings",
+    description: "Manage your account and preferences.",
+  },
 };
 
 const navItems = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: House,
-  },
-  {
-    label: "Transactions",
-    href: "/transaction",
-    icon: ReceiptText,
-  },
-  {
-    label: "Goals",
-    href: "/goals",
-    icon: Target,
-  },
-  {
-    label: "Reports",
-    href: "/reports",
-    icon: ChartColumn,
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
+  { label: "Dashboard", href: "/dashboard", icon: House },
+  { label: "Transactions", href: "/transaction", icon: ReceiptText },
+  { label: "Goals", href: "/goals", icon: Target },
+  { label: "Reports", href: "/reports", icon: ChartColumn },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 interface HeaderClientProps {
@@ -68,103 +68,150 @@ interface HeaderClientProps {
 
 const HeaderClient = ({ user }: HeaderClientProps) => {
   const pathname = usePathname();
+  const { avatarImage, avatarCustomized } = usePersonalSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileMenuOpen]);
 
   const page = pathname.split("/")[1] || "dashboard";
-  const title = pageTitles[page as keyof typeof pageTitles] || "Dashboard";
+  const details = pageDetails[page] ?? pageDetails.dashboard;
+  const displayImage = avatarCustomized ? avatarImage : user?.image;
 
   return (
     <>
-      <header className="flex w-full py-5 bg-white border-b px-4 md:px-10 h-17 justify-between items-center sticky top-0 z-40 md:z-50">
-        {/* LEFT */}
-        <div className="flex items-center gap-3">
-          {/* Mobile hamburger trigger */}
+      <header className="sticky top-0 z-40 flex min-h-16 w-full items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 px-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:px-5 md:z-50 md:px-8 2xl:px-10">
+        <div className="flex min-w-0 items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden -ml-1 text-gray-700 hover:bg-gray-100"
+            className="-ml-1 shrink-0 rounded-xl text-slate-700 hover:bg-emerald-50 md:hidden"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             <Menu className="size-6" />
           </Button>
 
-          <div>
-            <h1 className="font-bold text-lg md:text-xl">{title}</h1>
-
-            {title === "Transaction" && (
-              <p className="hidden sm:block text-sm text-gray-500 mt-0.5">
-                Track and manage all your income and expenses.
-              </p>
-            )}
-
-            {title === "Goals" && (
-              <p className="hidden sm:block text-sm text-gray-500 mt-0.5">
-                Track your progress and achieve your financial goals.
-              </p>
-            )}
+          <div className="min-w-0">
+            <p className="hidden text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700 sm:block">
+              Personal finance
+            </p>
+            <h1 className="truncate text-base font-bold tracking-tight text-slate-950 sm:text-lg">
+              {details.title}
+            </h1>
+            <p className="hidden truncate text-xs text-slate-500 lg:block">
+              {details.description}
+            </p>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-3 sm:gap-5">
-          {/* Notification */}
-          <div className="relative">
-            <Bell className="text-primary" />
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
+          <AddTransactionDialog>
+            <Button
+              size="sm"
+              aria-label="Add transaction"
+              className="h-9 w-9 rounded-xl px-0 shadow-sm sm:w-auto sm:gap-2 sm:px-3"
+            >
+              <Plus className="size-4" />
+              <span className="sr-only sm:not-sr-only">Add transaction</span>
+            </Button>
+          </AddTransactionDialog>
 
-            <span className="absolute -top-3 -right-3 bg-primary rounded-full px-1.5 py-0.5 text-xs text-white flex justify-center items-center">
-              0
-            </span>
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Notifications"
+              aria-expanded={notificationsOpen}
+              aria-haspopup="dialog"
+              className="size-9 rounded-xl border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800"
+              onClick={() => setNotificationsOpen((open) => !open)}
+            >
+              <Bell className="size-4" />
+            </Button>
+            {notificationsOpen && (
+              <div
+                role="status"
+                aria-label="Notifications"
+                className="absolute right-0 top-11 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl"
+              >
+                <p className="text-sm font-bold text-slate-900">You’re all caught up</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  New reminders and account updates will appear here.
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* USER */}
           {user && (
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={user.image ?? ""} alt={user.name} />
-
-                <AvatarFallback>
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+              <Avatar className="size-9 shrink-0 ring-2 ring-emerald-100 sm:size-10">
+                {displayImage && <AvatarImage src={displayImage} alt={user.name} />}
+                <AvatarFallback className="bg-emerald-50 font-bold text-emerald-800">
                   {user.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-
-              <div className="hidden sm:block">
-                <p className="font-medium text-sm">{user.name}</p>
-
-                <p className="text-xs text-gray-500">{user.email}</p>
+              <div className="hidden min-w-0 sm:block">
+                <p className="max-w-40 truncate text-sm font-semibold text-slate-900">
+                  {user.name}
+                </p>
+                <p className="max-w-40 truncate text-xs text-slate-500">
+                  {user.email}
+                </p>
               </div>
             </div>
           )}
         </div>
       </header>
 
-      {/* MOBILE NAVIGATION DRAWER */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <button
+            type="button"
+            aria-label="Close navigation menu"
+            className="fixed inset-0 bg-slate-950/45 backdrop-blur-md"
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Slide-over Drawer */}
-          <aside className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-50 shadow-xl flex flex-col justify-between overflow-y-auto">
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Dashboard navigation"
+              className="fixed inset-y-0 left-0 z-[61] flex w-72 max-w-[88vw] flex-col justify-between overflow-y-auto border-r border-white/60 bg-[#fbfdfc]/95 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-950/95"
+          >
             <div>
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b h-17">
+              <div className="flex h-16 items-center justify-between border-b border-slate-200/70 px-5">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-primary font-bold flex gap-1.5 items-center text-lg"
+                  className="flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900"
                 >
-                  <Bot className="size-6 -rotate-7" />
-                  SaveMyMoney
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-primary">
+                    <Bot className="size-5" />
+                  </span>
+                  SaveMy<span className="text-primary">Money</span>
                 </Link>
 
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 text-gray-500 hover:text-gray-900"
+                  className="size-9 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close navigation menu"
                 >
@@ -172,69 +219,62 @@ const HeaderClient = ({ user }: HeaderClientProps) => {
                 </Button>
               </div>
 
-              {/* Navigation Links */}
-              <nav className="flex flex-col gap-1 p-4">
+              <nav aria-label="Primary navigation" className="flex flex-col gap-1.5 p-4">
                 {navItems.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-emerald-700 text-white shadow-sm"
+                            : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-900 dark:text-slate-300 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-200"
+                      }`}
                     >
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-start pl-4 py-5 gap-3 font-semibold ${
-                          isActive
-                            ? "bg-primary/15 text-primary hover:bg-primary/20"
-                            : "text-muted-foreground hover:bg-primary/10"
-                        }`}
-                      >
-                        <item.icon className="size-5" />
-                        <span>{item.label}</span>
-                      </Button>
+                      <item.icon className="size-4" />
+                      <span>{item.label}</span>
                     </Link>
                   );
                 })}
               </nav>
 
-              {/* Quick Action: Add Transaction */}
-              <div className="px-4 mt-4">
+              <div className="px-4 pt-2">
                 <AddTransactionDialog>
-                  <Button className="w-full gap-2">
+                  <Button className="w-full gap-2 rounded-xl shadow-sm">
                     <Plus className="size-4" />
-                    Add Transaction
+                    Add transaction
                   </Button>
                 </AddTransactionDialog>
               </div>
             </div>
 
-            {/* Bottom Drawer Section: User info & Logout */}
-            <div className="p-4 border-t mt-auto">
+            <div className="mt-auto border-t border-slate-200 p-4">
               <form action={logout}>
                 <Button
                   type="submit"
                   variant="ghost"
-                  className="w-full justify-start text-muted-foreground hover:bg-primary/15 gap-2 font-semibold mb-3"
+                  className="mb-3 w-full justify-start gap-2 font-semibold text-slate-600 hover:bg-emerald-50"
                 >
                   <LogOut className="size-5" />
-                  Logout
+                  Sign out
                 </Button>
               </form>
-
               {user && (
-                <div className="flex items-center gap-3 pt-3 border-t">
-                  <Avatar className="size-9">
-                    <AvatarImage src={user.image ?? ""} alt={user.name} />
-                    <AvatarFallback>
+                <div className="flex items-center gap-3 border-t border-slate-200 pt-3">
+                  <Avatar className="size-9 ring-2 ring-emerald-100">
+                    {displayImage && <AvatarImage src={displayImage} alt={user.name} />}
+                    <AvatarFallback className="bg-emerald-50 font-bold text-emerald-800">
                       {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">{user.name}</p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user.email}
+                    <p className="truncate text-sm font-semibold text-slate-900">
+                      {user.name}
                     </p>
+                    <p className="truncate text-xs text-slate-500">{user.email}</p>
                   </div>
                 </div>
               )}

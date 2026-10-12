@@ -1,159 +1,78 @@
-import { Button } from "@/components/ui/button";
-import { CircleCheck } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
+
+const plans = [
+  {
+    name: "Free",
+    price: "0",
+    description: "A simple place to start building better habits.",
+    features: ["Track income & expenses", "Basic reports", "1 financial goal", "Up to 2 bank accounts"],
+    action: "Get started",
+  },
+  {
+    name: "Pro",
+    price: "499",
+    description: "More insight and flexibility for your finances.",
+    features: ["Everything in Free", "AI financial advisor", "Unlimited goals", "Subscription tracking", "Advanced analytics", "Priority support"],
+    action: "Start free trial",
+    popular: true,
+  },
+  {
+    name: "Premium",
+    price: "999",
+    description: "A deeper toolkit for your money journey.",
+    features: ["Everything in Pro", "Investment tracking", "Custom categories", "Export reports", "Dedicated support"],
+    action: "Start free trial",
+  },
+];
 
 const Pricing = () => {
   return (
-    <div id="pricing" className="w-[92%] sm:w-[85%] md:w-[70%] mx-auto">
-      <div className="flex flex-col justify-center items-center mb-5">
-        <h1 className="text-xl font-bold ">Simple, Transparent Pricing</h1>
-        <p className="text-sm font-semibold text-gray-600">
-          Choose the plan that works for you
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-3 items-stretch">
-        <div className="border shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col h-full hover:scale-102 transition-all">
-          <h2 className="font-extrabold text-2xl mb-3">Free</h2>
-          <div>
-            {" "}
-            <span className="text-3xl text-gray-600">₹ </span>
-            <span className="text-3xl font-bold">0 </span>
-            <span className="text-gray-500 font-semibold">/month</span>
-          </div>
-          <p className="font-bold text-gray-700 mb-3 text-sm mt-1">
-            Perfect for getting started
-          </p>
-          <div className="text-gray-500 font-semibold text-sm">
-            <ul className="space-y-1.5 font-bold">
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />
-                Track income & expenses
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Basic reports
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />1 financial
-                goal
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Up to 2 bank
-                accounts
-              </li>
-            </ul>
-          </div>
-          <div className="mt-auto">
-            <Link href={"/sign-up"}>
-              <Button className="bg-white text-primary border-primary/30 border-2 w-full font-semibold mt-10 hover:bg-primary hover:text-white hover:border-none transition-all">
-                Get started
-              </Button>
-            </Link>
-          </div>
+    <section id="pricing" className="landing-section scroll-mt-20">
+      <div className="landing-container-pricing mx-auto">
+        <div className="mb-10 text-center sm:mb-12">
+          <p className="landing-eyebrow mb-3">Simple, transparent pricing</p>
+          <h2 className="landing-section-title">Choose what works for you.</h2>
+          <p className="landing-muted mt-3 text-sm sm:text-base">Start with the basics. Grow into more when you’re ready.</p>
         </div>
-        <div className="border-primary border-2 shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col relative hover:scale-102 transition-all">
-          <div className="rounded-full w-fit py-1 px-10 text-white bg-primary text-sm font-bold absolute -top-4 left-1/2 -translate-x-1/2 md:left-24 md:translate-x-0">
-            Most popular
-          </div>
-          <h2 className="font-semibold text-2xl mb-3 text-primary">Pro</h2>
-          <div>
-            <span className="text-3xl text-gray-600">₹ </span>
-            <span className="text-3xl font-bold text-primary">499 </span>
-            <span className="text-gray-500 font-semibold">/month</span>
-          </div>
-          <p className="font-bold text-gray-700 mb-3 text-sm mt-1">
-            For individual who want more
-          </p>
-          <div className=" font-semibold text-sm">
-            <ul className="space-y-1.5 font-bold">
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />
-                Everything in free
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> AI finacial
-                Advisor
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />
-                Unlimited goal
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Subscription
-                tracking
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Advanced
-                analytics
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Priority
-                support
-              </li>
-            </ul>
-          </div>
-          <div className="mt-auto">
-            <Button className="bg-primary text-white w-full font-semibold hover:bg-primary hover:text-white hover:border-none transition-all mt-3">
-              Start Free Trial
-            </Button>
-          </div>
-        </div>
-        <div className="border shadow-md shadow-gray-200 pt-5 pb-3 rounded-md px-7 flex flex-col hover:scale-102 transition-all">
-          <h2 className="font-extrabold text-2xl mb-3">Premium</h2>
-          <div>
-            <span className="text-3xl text-gray-600">₹ </span>
-            <span className="text-3xl font-bold">999 </span>
-            <span className="text-gray-500 font-semibold">/month</span>
-          </div>
-          <p className="font-bold text-gray-700 mb-3 text-sm mt-1">
-            For power users
-          </p>
-          <div className="text-gray-500 font-semibold text-sm">
-            <ul className="space-y-1.5 font-bold">
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />
-                Everything in Pro
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Investment
-                tracking
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" />
-                Custom categories
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Export
-                reports
-              </li>
-              <li className="flex gap-3">
-                {" "}
-                <CircleCheck className="inline text-primary/60" /> Dedicated
-                support
-              </li>
-            </ul>
-          </div>
-          <div className="mt-auto">
-            <Button className="bg-white text-primary border-primary/30 border-2 w-full font-semibold mt-10 hover:bg-primary hover:text-white hover:border-none transition-all">
-              Start Free Trial
-            </Button>
-          </div>
+
+        <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5">
+          {plans.map((plan) => (
+            <article
+              key={plan.name}
+              className={`pricing-card landing-surface relative flex flex-col rounded-[24px] border p-6 sm:p-7 ${plan.popular ? "pricing-card-popular lg:-translate-y-2" : "landing-border"}`}
+            >
+              {plan.popular && <span className="pricing-popular-badge absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em]">Most popular</span>}
+              <p className={`mb-1 text-sm font-semibold ${plan.popular ? "landing-accent-text" : ""}`}>{plan.name}</p>
+              <p className="landing-muted min-h-10 text-xs leading-5">{plan.description}</p>
+              <div className="my-5 flex items-baseline gap-1">
+                <span className="text-xl font-medium">₹</span>
+                <span className="text-4xl font-semibold tracking-[-0.06em]">{plan.price}</span>
+                <span className="landing-muted ml-1 text-xs">/ month</span>
+              </div>
+              <div className="landing-border border-t pt-5">
+                <ul className="space-y-3">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2.5 text-[13px] leading-5">
+                      <Check className="landing-accent-text mt-0.5 size-4 shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-auto pt-7">
+                <Link
+                  href="/sign-up"
+                  className={`inline-flex h-11 w-full items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors ${plan.popular ? "landing-button" : "landing-outline-button border landing-border"}`}
+                >
+                  {plan.action}
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

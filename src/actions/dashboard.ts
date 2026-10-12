@@ -5,7 +5,6 @@ import {
   getRecentTransactions,
   getTotalExpense,
   getTotalIncome,
-  getAllTransactions,
 } from "./transactions";
 
 export async function getDashboardData() {
@@ -13,16 +12,14 @@ export async function getDashboardData() {
     transactions,
     totalIncome,
     totalExpense,
-    expensesByCategory,
+    expenseBreakdown,
     totalSavings,
-    allTransactions,
   ] = await Promise.all([
     getRecentTransactions(),
     getTotalIncome(),
     getTotalExpense(),
-    getExpensesByCategory(),
+    getExpensesByCategory("This month"),
     getMonthlySavings(),
-    getAllTransactions(),
   ]);
 
   const hasTransaction = transactions.length > 0;
@@ -34,7 +31,6 @@ export async function getDashboardData() {
     totalExpense,
     totalBalance: totalIncome - totalExpense,
     totalSavings,
-    expensesByCategory,
-    allTransactions,
+    expenseBreakdown,
   };
 }

@@ -13,12 +13,15 @@ const TransactionSummary = ({
   totalExpense,
 }: TransactionSummaryProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <section
+      aria-label="Transaction summary"
+      className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4"
+    >
       <SummaryCard
         title="Total Transactions"
         amount={totalTransactions}
         icon={Wallet}
-        amountClassName="text-gray-900"
+        amountClassName="text-slate-900"
         showCurrency={false}
       />
 
@@ -35,7 +38,7 @@ const TransactionSummary = ({
         iconClassName="bg-red-500/10 text-red-500"
         amountClassName="text-red-500"
       />
-    </div>
+    </section>
   );
 };
 

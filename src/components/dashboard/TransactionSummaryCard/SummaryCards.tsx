@@ -1,4 +1,4 @@
-import { ArrowUpRight, CircleArrowDown, PiggyBank, Wallet } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, PiggyBank, Wallet } from "lucide-react";
 
 import SummaryCard from "./SummaryCard";
 
@@ -16,22 +16,20 @@ const SummaryCards = ({
   totalSavings,
 }: SummaryCardsProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <section aria-label="Financial summary" className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <SummaryCard
         title="Total Balance"
         amount={totalBalance}
         icon={Wallet}
         amountColor={totalBalance < 0 ? "text-red-500" : "text-primary"}
-        change={12.5}
-        subtitle="from last month"
+        subtitle="Income minus expenses"
       />
 
       <SummaryCard
         title="Total Income"
         amount={totalIncome}
-        icon={CircleArrowDown}
-        change={12.5}
-        subtitle="from last month"
+        icon={ArrowDownLeft}
+        subtitle="Income recorded so far"
       />
 
       <SummaryCard
@@ -40,8 +38,7 @@ const SummaryCards = ({
         icon={ArrowUpRight}
         iconColor="bg-red-500/10 text-red-500"
         amountColor="text-red-500"
-        change={12.5}
-        subtitle="from last month"
+        subtitle="Expenses recorded so far"
       />
 
       <SummaryCard
@@ -49,10 +46,9 @@ const SummaryCards = ({
         amount={totalSavings}
         icon={PiggyBank}
         amountColor={totalSavings < 0 ? "text-red-500" : "text-primary"}
-        change={12.5}
-        subtitle="from last month"
+        subtitle="Net savings this month"
       />
-    </div>
+    </section>
   );
 };
 

@@ -1,4 +1,4 @@
-import { LucideIcon, TrendingUp } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type SummaryCardProps = {
   title: string;
@@ -18,24 +18,26 @@ const SummaryCard = ({
   showCurrency = true,
 }: SummaryCardProps) => {
   return (
-    <div className="p-3 flex bg-white rounded-md gap-4 w-97 md:w-full">
+    <article className="summary-card group relative isolate flex min-w-0 items-start gap-3 overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-emerald-50/40 p-3.5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md sm:gap-4 sm:p-5 dark:hover:border-emerald-800">
       <div
-        className={`px-4 py-4 h-fit rounded-md flex justify-center items-center ${iconClassName}`}
+        className={`flex size-10 h-fit shrink-0 items-center justify-center rounded-xl ring-1 ring-black/[0.04] sm:size-12 sm:rounded-2xl ${iconClassName}`}
       >
-        <Icon className="size-8" />
+        <Icon className="size-5 sm:size-6" aria-hidden="true" />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="font-semibold text-gray-600 text-sm">{title}</span>
-        <span className={`text-2xl font-bold ${amountClassName}`}>
+      <div className="min-w-0">
+        <p className="min-h-8 text-[10px] font-bold uppercase leading-4 tracking-[0.08em] text-slate-500 sm:min-h-0 sm:text-xs sm:tracking-[0.1em]">
+          {title}
+        </p>
+        <p
+          className={`mt-2 break-words text-xl font-bold leading-tight tracking-tight tabular-nums sm:mt-3 sm:text-2xl lg:text-3xl ${amountClassName}`}
+        >
           {showCurrency && "₹"}
           {amount.toLocaleString("en-IN")}
-        </span>
-        <div className="text-xs text-gray-500 font-semibold flex items-center gap-1">
-          <span className="flex items-center gap-1">All time</span>
-        </div>
+        </p>
+        <p className="mt-2 text-[11px] font-medium text-slate-500 sm:text-xs">All time</p>
       </div>
-    </div>
+    </article>
   );
 };
 

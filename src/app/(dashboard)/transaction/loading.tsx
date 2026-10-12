@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const TransactionLoading = () => {
   return (
-    <main className="w-full bg-gray-100 md:px-10 md:pt-10 flex flex-col gap-6 md:pb-1 min-h-[calc(100vh-68px)] p-2">
+    <main className="flex min-h-[calc(100vh-68px)] w-full min-w-0 flex-col gap-5 bg-slate-50 px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-5 h-32 flex flex-col justify-between">

@@ -6,8 +6,8 @@ import SetupCard from "./SetupCard/SetupCard";
 import RecentTransaction from "./RecentTransaction/RecentTransaction";
 import ExpensesByCategory from "./ExpensesByCategory/ExpensesByCategory";
 import TipSection from "./TipSection/TipSection";
-import EmptyCard from "./EmptyCard/EmptyCard";
 import { getGoalsPageData } from "@/actions/goalsPage";
+import SpendingAlert from "./SpendingAlert";
 
 type DashboardContentProps = {
   user: User;
@@ -24,44 +24,40 @@ export default async function DashboardContent({
     totalExpense,
     totalBalance,
     totalSavings,
-    expensesByCategory,
+    expenseBreakdown,
   } = await getDashboardData();
 
   const completedSteps = (hasTransaction ? 1 : 0) + (hasGoals ? 1 : 0);
-  const progress = (completedSteps / 4) * 100;
+  const progress = Math.round((completedSteps / 2) * 100);
 
   return (
-    <main className="w-full bg-gray-100 px-4 pt-6 md:px-10 md:pt-10 flex flex-col gap-6 pb-6 md:pb-1 min-h-[calc(100vh-68px)]">
+    <div className="min-w-0 w-full space-y-5 bg-slate-50 px-4 pb-8 pt-5 dark:bg-slate-950 sm:px-6 sm:pt-6 lg:px-8 2xl:px-10">
       <WelcomeCard user={user} progress={progress} />
+      <SpendingAlert monthlyExpense={expenseBreakdown.totalExpense} />
 
-      {hasTransaction && (
-        <SummaryCards
-          totalIncome={totalIncome}
-          totalExpense={totalExpense}
-          totalBalance={totalBalance}
-          totalSavings={totalSavings}
-        />
-      )}
+      <SummaryCards
+        totalIncome={totalIncome}
+        totalExpense={totalExpense}
+        totalBalance={totalBalance}
+        totalSavings={totalSavings}
+      />
 
-      <div
-        className={`grid gap-4 ${
-          hasTransaction ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
-        }`}
-      >
+      <section className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <SetupCard hasTransaction={hasTransaction} hasGoals={hasGoals} />
+        <RecentTransaction transactions={transactions} />
+        <div className="min-w-0 xl:col-span-2">
+          <ExpensesByCategory
+            key={transactions[0]?.id ?? "empty"}
+            initialBreakdown={expenseBreakdown}
+          />
+        </div>
+      </section>
 
-        {!hasTransaction && <EmptyCard />}
-
-        {hasTransaction && (
-          <>
-            <RecentTransaction transactions={transactions} />
-
-            <ExpensesByCategory expensesByCategory={expensesByCategory} />
-          </>
-        )}
-      </div>
-
-      <TipSection />
-    </main>
+      <TipSection
+        hasTransaction={hasTransaction}
+        totalExpense={totalExpense}
+        totalSavings={totalSavings}
+      />
+    </div>
   );
 }

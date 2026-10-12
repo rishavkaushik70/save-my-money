@@ -7,83 +7,51 @@ import {
   Target,
 } from "lucide-react";
 
+const features = [
+  {
+    icon: ChartNoAxesColumn,
+    title: "Smart analytics",
+    description: "See where your money goes with clear charts and spending patterns.",
+  },
+  {
+    icon: Brain,
+    title: "AI financial advisor",
+    description: "Get personal suggestions shaped around your everyday finances.",
+  },
+  {
+    icon: Target,
+    title: "Budget planning",
+    description: "Set flexible limits and keep your goals moving in the right direction.",
+  },
+  {
+    icon: CreditCard,
+    title: "Subscription tracker",
+    description: "Keep recurring expenses in view and stay ahead of payment dates.",
+  },
+  {
+    icon: ChartCandlestick,
+    title: "Investment insights",
+    description: "Bring your investments into the bigger picture of your money.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure & private",
+    description: "Manage your finances with privacy and security in mind.",
+  },
+];
+
 const FeaturesCard = () => {
   return (
-    <div className="w-full max-w-7xl md:w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-5 mt-3 mx-auto px-4 md:px-0 justify-items-center">
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <ChartNoAxesColumn className="text-primary" />
-        </span>
-        <h1 className="font-bold">Smart Analytics</h1>
-        <p className="text-gray-500 text-sm mx-4">
-          Visualise your spending patterns with beautiful dashboard and charts
-        </p>
-      </div>
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <Brain className="text-primary" />
-        </span>
-        <h1 className="font-bold">AI Financial Advisor</h1>
-        <p className="text-gray-500 text-sm mx-4">
-          Get personalized tips and recommendations powered by AI.
-        </p>
-      </div>
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-target-arrow-icon lucide-target-arrow text-primary"
-          >
-            <path d="M19 2v3h3" />
-            <path d="M13.4 10.6 22 2" />
-            <circle cx="12" cy="12" r="2" />
-            <path d="M12.3 6H12a6 6 0 1 0 6 6v-.3" />
-            <path d="M15 2.5A9.93 9.93 0 1 0 21.5 9" />
-            <path d="M5.3 19.4 4 22" />
-            <path d="M18.7 19.4 20 22" />
-          </svg>
-        </span>
-        <h1 className="font-bold">Budget Planning</h1>
-        <p className="text-gray-500 text-sm mx-2">
-          Set budgets, tracks limits and stay on the top of your financial
-          goals.
-        </p>
-      </div>
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <CreditCard className="text-primary" />
-        </span>
-        <h1 className="font-bold">Subscription Tracker</h1>
-        <p className="text-gray-500 text-sm mx-5">
-          Track all your subcriptions and never miss a payment.
-        </p>
-      </div>
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <ChartCandlestick className="text-primary" />
-        </span>
-        <h1 className="font-bold">Investment Insights</h1>
-        <p className="text-gray-500 text-sm">
-          Monitor your investments and get smart insights to grow wealth.
-        </p>
-      </div>
-      <div className="w-full max-w-xs md:max-w-50 flex flex-col justify-center items-center gap-3 py-5 bg-white shadow-md border-gray-100 rounded-md shadow-gray-300 border text-center">
-        <span className="border px-3 py-3 rounded-md  bg-primary/10">
-          <ShieldCheck className="text-primary" />
-        </span>
-        <h1 className="font-bold">Secure & Private</h1>
-        <p className="text-gray-500 text-sm mx-4">
-          Bank-level security ensures your data is always protected.
-        </p>
-      </div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map(({ icon: Icon, title, description }) => (
+        <article key={title} className="feature-card landing-surface group rounded-[22px] border landing-border p-6 sm:p-7">
+          <div className="landing-icon-box mb-6 flex size-11 items-center justify-center rounded-[14px] transition-transform group-hover:-translate-y-0.5">
+            <Icon className="size-[19px]" strokeWidth={1.8} />
+          </div>
+          <h3 className="mb-2 text-[15px] font-semibold tracking-[-0.02em]">{title}</h3>
+          <p className="landing-muted text-sm leading-6">{description}</p>
+        </article>
+      ))}
     </div>
   );
 };

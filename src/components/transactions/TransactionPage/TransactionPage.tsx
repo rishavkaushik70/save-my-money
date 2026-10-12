@@ -6,7 +6,7 @@ const TransactionPage = async () => {
   const { allTransactions, totalIncome, totalExpense, totalTransactions } =
     await getTransactionPageData();
   return (
-    <div className="w-full bg-gray-100 px-4 py-6 md:px-10 md:pt-10 flex flex-col gap-6 md:pb-1 min-h-[calc(100vh-68px)]">
+    <div className="flex min-h-[calc(100vh-68px)] w-full min-w-0 flex-col gap-5 bg-slate-50 px-4 py-5 pb-8 sm:px-6 lg:px-8 lg:py-7 dark:bg-slate-950">
       <TransactionSummary
         totalTransactions={totalTransactions}
         totalIncome={totalIncome}

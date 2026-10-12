@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,19 +15,21 @@ type AddTransactionDialogProps = {
 };
 
 export function AddTransactionDialog({ children }: AddTransactionDialogProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={children} />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className={"text-xl"}>
-            Add Your First Transaction
+          <DialogTitle className="text-xl font-bold tracking-tight">
+            Add a transaction
           </DialogTitle>
           <DialogDescription>
-            Track your income or expenses to take control of your finances.
+            Keep your income and expenses up to date. Amounts are limited to ₹10,00,000 per transaction.
           </DialogDescription>
         </DialogHeader>
-        <AddTransactionForm />
+        <AddTransactionForm onSuccess={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

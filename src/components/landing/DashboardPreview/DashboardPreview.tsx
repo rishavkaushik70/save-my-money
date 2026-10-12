@@ -1,74 +1,42 @@
 import Image from "next/image";
-import { ArrowRight, CircleCheck, HandFist } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { ArrowUpRight, Sparkles, TrendingUp } from "lucide-react";
 
 const DashboardPreview = () => {
   return (
-    <div id="howItWorks">
-      <div className="w-[92%] sm:w-[90%] md:w-[80%] mx-auto grid grid-cols-1 md:grid-cols-2 px-4 sm:px-7 py-6 md:py-5 bg-primary/5 mb-10 rounded-md gap-6 md:gap-0">
-        <div>
-          <Image
-            src="/Dashboard 2.PNG"
-            alt="Dashboard Preview"
-            height={1200}
-            width={800}
-            className="shadow-md shadow-gray-300 rounded-md w-full h-auto"
-          ></Image>
-        </div>
-        <div className="ml-0 md:ml-15 flex flex-col items-start gap-5">
-          <span className="mt-1 md:mt-3">
-            <Badge className="bg-primary/9 text-primary px-3 font-bold">
-              <HandFist />
-              Powerful Dashboard
-            </Badge>
-          </span>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold">All Your Finances.</h1>
-            <h1 className="text-3xl sm:text-4xl font-extrabold">
-              One Beautiful Dashboard.
-            </h1>
-          </div>
-          <div className="text-gray-500 font-semibold w-full md:w-[70%]">
-            <p>Get a complete overview of your financial health.</p>
-            <p>Track income, expenses, budget, goals and more in real time.</p>
-          </div>
-          <div className="text-gray-500 font-semibold">
-            <ul className="space-y-1.5">
-              <li>
-                {" "}
-                <CircleCheck className="inline text-primary/60 mr-2.5" />
-                Real-time transaction tracking.
-              </li>
-              <li>
-                {" "}
-                <CircleCheck className="inline text-primary/60 mr-2" />{" "}
-                Interactive charts and reports.
-              </li>
-              <li>
-                {" "}
-                <CircleCheck className="inline text-primary/60 mr-2" /> Goal
-                progress and budget alerts
-              </li>
-              <li>
-                {" "}
-                <CircleCheck className="inline text-primary/60 mr-2" /> Export
-                data anytime
-              </li>
-            </ul>
-          </div>
-          <Link href={"/sign-up"}>
-            <Button
-              className={
-                "mt-3 shadow-md shadow-gray-500 border-none font-semibold hover:bg-primary/80 w-full"
-              }
-            >
-              Explore Dashboard <ArrowRight className="size-5" />{" "}
-            </Button>
-          </Link>
-        </div>
+    <div id="howItWorks" className="dashboard-preview relative mx-auto w-full max-w-[650px] scroll-mt-28">
+      <div className="dashboard-preview-glow" aria-hidden="true" />
+      <div className="dashboard-image-frame landing-surface relative overflow-hidden rounded-[24px] border landing-border p-1.5 sm:rounded-[28px] sm:p-2">
+        <Image
+          src="/Dashboard 2.PNG"
+          alt="SaveMyMoney dashboard with balance cards, spending insights, transactions, and a monthly trend chart"
+          width={1536}
+          height={1024}
+          priority
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="h-auto w-full rounded-[18px] sm:rounded-[22px]"
+        />
       </div>
+      <div className="dashboard-float-card landing-surface absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl border landing-border p-3.5 sm:bottom-5 sm:-left-8 sm:p-4">
+        <span className="landing-icon-box flex size-10 items-center justify-center rounded-xl"><Sparkles className="size-5" /></span>
+        <span className="flex flex-col gap-0.5">
+          <span className="landing-muted text-[10px] font-medium uppercase tracking-[0.08em]">A little more clarity</span>
+          <span className="text-xs font-semibold sm:text-sm">Your money, at a glance</span>
+        </span>
+        <ArrowUpRight className="landing-accent-text ml-1 size-4" />
+      </div>
+      <span
+        className="dashboard-orbit grid place-items-center"
+        role="img"
+        aria-label="Savings trend is moving up"
+        style={{
+          color: "var(--lp-accent)",
+          background: "linear-gradient(145deg, var(--lp-accent-soft), var(--lp-surface))",
+          borderColor: "color-mix(in srgb, var(--lp-accent) 24%, transparent)",
+          boxShadow: "0 12px 28px rgb(31 64 43 / 13%)",
+        }}
+      >
+        <TrendingUp className="size-5" aria-hidden="true" strokeWidth={2.4} />
+      </span>
     </div>
   );
 };

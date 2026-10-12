@@ -8,7 +8,7 @@ interface GoalListProps {
 
 const GoalList = ({ goals }: GoalListProps) => {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid min-w-0 grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {goals.map((goal) => (
         <GoalCard key={goal.id} goal={goal} />
       ))}

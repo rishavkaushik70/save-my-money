@@ -1,72 +1,46 @@
 import { ArrowRight, Bot } from "lucide-react";
-import { FaSquareTwitter } from "react-icons/fa6";
-import { FaSquareInstagram } from "react-icons/fa6";
-import { FaGithub } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
+import Link from "next/link";
 
 const Footer = () => {
   return (
-    <div className="w-[95%] mx-auto flex flex-col md:flex-row px-6 md:px-20 py-8 md:py-0 border rounded-md bg-gray-200/30 border-gray-50 gap-8 md:gap-0">
-      <div className="flex flex-col w-full md:w-[20%] gap-2 py-3">
-        <div>
-          <span className="text-primary text-sm font-bold flex gap-2 items-center">
-            <Bot className="size-8 md:size-10 -rotate-7" /> SaveMyMoney
-          </span>
+    <footer className="landing-footer border-t landing-border">
+      <div className="landing-container mx-auto py-10 sm:py-14">
+        <div className="grid grid-cols-1 gap-9 sm:grid-cols-2 lg:grid-cols-[1.5fr_0.8fr_0.8fr_1fr] lg:gap-12">
+          <div>
+            <Link href="#top" className="landing-brand inline-flex items-center gap-2.5">
+              <span className="landing-logo-mark flex size-10 items-center justify-center rounded-[14px]"><Bot className="size-6" /></span>
+              <span className="text-lg font-bold tracking-[-0.04em]">SaveMy<span className="landing-accent-text">Money</span></span>
+            </Link>
+            <p className="landing-muted mt-4 max-w-[280px] text-sm leading-6">
+              A little more clarity for the money decisions you make every day.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 text-sm">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">Explore</p>
+            <Link className="landing-footer-link" href="#features">Features</Link>
+            <Link className="landing-footer-link" href="#howItWorks">Product</Link>
+            <Link className="landing-footer-link" href="#pricing">Pricing</Link>
+          </div>
+          <div className="flex flex-col gap-3 text-sm">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">Account</p>
+            <Link className="landing-footer-link" href="/sign-up">Create an account</Link>
+            <Link className="landing-footer-link" href="/sign-in">Sign in</Link>
+            <Link className="landing-footer-link" href="#faq">FAQs</Link>
+          </div>
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em]">Start with a clearer view</p>
+            <p className="landing-muted mb-4 text-sm leading-6">Take the first step toward more confident money habits.</p>
+            <Link href="/sign-up" className="landing-button inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold">
+              Get started <ArrowRight className="size-4" />
+            </Link>
+          </div>
         </div>
-        <div className="text-[12px] text-gray-500 font-semibold w-full md:w-[70%]">
-          AI powered personal finance management for a better future.
-        </div>
-        <div className="flex gap-3 text-xl w-fit cursor-pointer mt-2">
-          <FaSquareTwitter className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
-          <FaSquareInstagram className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
-          <FaGithub className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
-          <FaLinkedin className="border py-1 px-1 size-8 rounded-full bg-gray-300" />
-        </div>
-      </div>
-      <div className="flex flex-col w-full md:w-[20%] py-3">
-        <ul>
-          <li className="font-bold mb-2">Product</li>
-          <li className="text-gray-500 text-sm">Features</li>
-          <li className="text-gray-500 text-sm">Pricing</li>
-          <li className="text-gray-500 text-sm">Security</li>
-          <li className="text-gray-500 text-sm">Changelog</li>
-        </ul>
-      </div>
-      <div className="flex flex-col w-full md:w-[20%] py-3">
-        <ul>
-          <li className="font-bold mb-2">Company</li>
-          <li className="text-gray-500 text-sm">About us</li>
-          <li className="text-gray-500 text-sm">Blog</li>
-          <li className="text-gray-500 text-sm">Careers</li>
-          <li className="text-gray-500 text-sm">Contact</li>
-        </ul>
-      </div>
-      <div className="flex flex-col w-full md:w-[20%] py-3">
-        <ul>
-          <li className="font-bold mb-2">Support</li>
-          <li className="text-gray-500 text-sm">Help center</li>
-          <li className="text-gray-500 text-sm">Privacy policy</li>
-          <li className="text-gray-500 text-sm">Terms of service</li>
-          <li className="text-gray-500 text-sm">FAQs</li>
-        </ul>
-      </div>
-      <div className="flex flex-col w-full md:w-[20%] py-3">
-        <p className="font-bold mb-2">Stay Updated</p>
-        <p className="text-gray-500 text-sm">
-          Get tips on saving money and financial management
-        </p>
-        <div className="flex items-center justify-center w-full h-fit mt-4 gap-3">
-          <input
-            type="text"
-            className="border rounded-md placeholder:pl-5 placeholder:text-sm h-full w-full"
-            placeholder="Enter your email.."
-          />
-          <button className="cursor-pointer">
-            <ArrowRight className="text-white rounded-full bg-primary size-8 py-2 px-2" />
-          </button>
+        <div className="landing-border landing-muted mt-10 flex flex-col gap-2 border-t pt-5 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} SaveMyMoney</span>
+          <span>Make room for what matters.</span>
         </div>
       </div>
-    </div>
+    </footer>
   );
 };
 

@@ -1,41 +1,34 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, SquareArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const HeroSection = () => {
   return (
-    <div className="flex flex-col items-center relative mx-auto w-full max-w-6xl md:w-6xl px-4 md:px-0">
-      <Badge className="bg-primary/10 w-fit text-left text-primary text-sm font-bold py-3 px-5 relative md:absolute mb-6 md:mb-0 md:-top-14 md:left-56">
-        <Zap className="-rotate-20 text-yellow-500 mr-1.5" />
-        AI-Powered Personal Finance
-      </Badge>
-      <h1 className="max-w-6xl text-4xl sm:text-5xl font-bold md:text-6xl lg:text-8xl">
-        Take Control of
+    <div className="hero-copy flex flex-col items-start">
+      <div className="landing-pill mb-6 inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[11px] font-semibold sm:text-xs">
+        <Sparkles className="size-3.5" />
+        A calmer way to manage money
+      </div>
+      <h1 className="hero-title max-w-[650px] text-[clamp(3.1rem,6vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.075em]">
+        Your money,
+        <br />
+        finally in <span className="landing-accent-text">focus.</span>
       </h1>
-      <h1 className="max-w-6xl text-4xl sm:text-5xl font-bold md:text-6xl lg:text-8xl">
-        Your <span className="text-primary">Money</span> with AI.
-      </h1>
-      <p className="mt-6 md:mt-10 text-gray-500 font-semibold w-full sm:w-[85%] md:w-[70%] text-base sm:text-lg md:text-xl">
-        Track your income, expenses and financial goals in one beautiful
-        dashboard. Get AI-powered insights to save smarter and grow your wealth.
+      <p className="landing-muted mt-6 max-w-[520px] text-base leading-7 sm:text-lg sm:leading-8">
+        Track spending, build better habits, and grow your wealth with AI that works for you.
       </p>
 
-      <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-30 w-full sm:w-auto justify-center">
-        <Link href={"/sign-up"} className="w-full sm:w-auto">
-          <Button
-            className={
-              "shadow-md shadow-gray-500 border-none font-semibold hover:bg-primary/80 w-full"
-            }
-          >
-            Start Tracking Free <SquareArrowRight className="size-5" />{" "}
-          </Button>
+      <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <Link href="/sign-up" className="landing-button inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold">
+          Start for free <ArrowRight className="size-4" />
         </Link>
-        <Link href={"#howItWorks"} className="w-full sm:w-auto">
-          <Button variant={"outline"} className={"font-semibold shadow-md w-full sm:w-auto"}>
-            View Demo <ArrowRight />{" "}
-          </Button>
+        <Link href="#howItWorks" className="landing-outline-button inline-flex h-12 items-center justify-center gap-2 rounded-full border landing-border px-6 text-sm font-semibold">
+          Explore the dashboard <ArrowRight className="size-4" />
         </Link>
+      </div>
+
+      <div className="landing-muted mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium sm:text-[13px]">
+        <span className="inline-flex items-center gap-2"><Check className="landing-accent-text size-4" /> Free to get started</span>
+        <span className="inline-flex items-center gap-2"><Check className="landing-accent-text size-4" /> Built around your goals</span>
       </div>
     </div>
   );

@@ -6,21 +6,21 @@ const EmptyGoalCard = () => {
     <AddGoalDialog>
       <button
         type="button"
-        className="bg-white border-2 border-dashed border-gray-300 hover:border-primary/50 hover:bg-gray-50/50 transition-all rounded-md flex flex-col justify-center items-center gap-3 p-6 text-center cursor-pointer min-h-[220px] md:min-h-[280px] w-full group outline-none focus-visible:border-primary"
+        className="group flex h-full min-h-[25rem] w-full flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-emerald-200 bg-white/70 p-6 text-center shadow-[0_12px_36px_-34px_rgba(15,23,42,0.35)] transition duration-200 hover:-translate-y-1 hover:border-emerald-400 hover:bg-emerald-50/60 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
       >
-        <div className="rounded-full p-3 border-2 border-gray-400/80 group-hover:border-primary/80 group-hover:text-primary flex justify-center items-center size-12 sm:size-14 text-gray-500 transition-colors">
-          <Plus className="size-6" />
+        <div className="flex size-14 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-700 transition-colors group-hover:bg-emerald-100">
+          <Plus className="size-6" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="font-bold text-gray-700 group-hover:text-gray-900 text-lg sm:text-xl transition-colors">
+          <h2 className="break-words text-lg font-bold text-slate-900 transition-colors sm:text-xl">
             Create New Goal
           </h2>
         </div>
-        <p className="text-gray-500 text-xs sm:text-sm max-w-[220px]">
+        <p className="max-w-[240px] text-sm leading-6 text-slate-600">
           Set a new financial goal and start saving.
         </p>
-        <span className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium shadow-xs group-hover:bg-primary/90 transition-colors">
-          <Plus className="size-4" /> Create Goal
+        <span className="mt-1 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-4 text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-emerald-800">
+          <Plus className="size-4" aria-hidden="true" /> Create goal
         </span>
       </button>
     </AddGoalDialog>

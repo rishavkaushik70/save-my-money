@@ -17,13 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Calendar, TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
   TransactionInput,
   TransactionOutput,
+  MAX_TRANSACTION_AMOUNT,
   transactionSchema,
 } from "@/lib/validators/transactions";
 import { useForm } from "react-hook-form";
@@ -43,7 +44,11 @@ const items = [
   { label: "Food", value: "Food" },
 ];
 
-const AddTransactionForm = () => {
+type AddTransactionFormProps = {
+  onSuccess?: () => void;
+};
+
+const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
   const onSubmit = async (data: TransactionOutput) => {
     const result = await createTransaction(data);
     if (!result.success) {
@@ -53,6 +58,7 @@ const AddTransactionForm = () => {
 
     toast.success(result.message);
     form.reset();
+    onSuccess?.();
   };
   const form = useForm<TransactionInput, undefined, TransactionOutput>({
     resolver: zodResolver(transactionSchema),
@@ -69,7 +75,7 @@ const AddTransactionForm = () => {
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="space-y-4">
         <Field>
-          <Label>Title</Label>
+          <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             placeholder="e.g. Salary, Grocery, Freelance Project"
@@ -129,14 +135,23 @@ const AddTransactionForm = () => {
           )}
         </Field>
         <Field>
-          <Label>Amount</Label>
+          <Label htmlFor="amount">Amount</Label>
           <Input
             id="amount"
-            placeholder="₹ 0.00"
+            type="number"
+            min="0.01"
+            max={MAX_TRANSACTION_AMOUNT}
+            step="0.01"
+            inputMode="decimal"
+            placeholder="0.00"
+            aria-describedby="amount-limit"
             {...form.register("amount")}
           />
+          <p id="amount-limit" className="text-xs text-muted-foreground">
+            Maximum ₹10,00,000 per transaction.
+          </p>
           {form.formState.errors.amount && (
-            <p className="text-sm text-red-500">
+            <p role="alert" className="text-sm text-red-500">
               {form.formState.errors.amount.message}
             </p>
           )}
@@ -178,8 +193,9 @@ const AddTransactionForm = () => {
           )}
         </Field>
         <Field>
-          <Label htmlFor="username-1">Date</Label>
+          <Label htmlFor="transaction-date">Date</Label>
           <Input
+            id="transaction-date"
             type="date"
             max={new Date().toISOString().split("T")[0]}
             {...form.register("date", {
@@ -188,8 +204,9 @@ const AddTransactionForm = () => {
           />
         </Field>
         <Field>
-          <Label htmlFor="username-1">Description (Optional)</Label>
+          <Label htmlFor="description">Description (Optional)</Label>
           <Textarea
+            id="description"
             placeholder="Add a short description (Optional)"
             className="resize-none"
             {...form.register("description")}

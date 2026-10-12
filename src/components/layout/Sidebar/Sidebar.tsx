@@ -1,154 +1,71 @@
-import {
-  BicepsFlexed,
-  Bot,
-  ChartColumn,
-  House,
-  LogOut,
-  Plus,
-  ReceiptText,
-  Settings,
-  Target,
-} from "lucide-react";
-import Link from "next/link";
-import { Button } from "../../ui/button";
-import { LucideIcon } from "lucide-react";
+import { Bot, LogOut, Plus } from "lucide-react";
 import Image from "next/image";
-import { AddTransactionDialog } from "../../transactions/AddTransactionDialog/add-transaction-dialog";
+import Link from "next/link";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+
 import { logout } from "@/actions/auth";
+import { auth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog/add-transaction-dialog";
+
 import SidebarClient from "./SidebarClient";
-
-type NavItem = {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-};
-
-const sidebarItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: House,
-  },
-  {
-    label: "Transactions",
-    href: "/transaction",
-    icon: ReceiptText,
-  },
-  {
-    label: "Goals",
-    href: "/goals",
-    icon: Target,
-  },
-  {
-    label: "Reports",
-    href: "/reports",
-    icon: ChartColumn,
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-];
+import SidebarNavigation from "./SidebarNavigation";
 
 const Sidebar = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  const user = session?.user;
+  const session = await auth.api.getSession({ headers: await headers() });
 
   return (
-    <div className="border-r w-70 h-screen flex-col sticky top-0 overflow-y-auto bg-white hidden md:flex">
-      {/* Logo */}
-      <Link href="/">
-        <div className="border-b w-full flex items-center justify-center py-5 h-17">
-          <span className="text-primary font-bold flex gap-1 items-center text-lg">
-            <Bot className="size-7 -rotate-7" />
-            SaveMyMoney
+    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-200/80 bg-[#fbfdfc] px-3 py-4 dark:border-slate-800 dark:bg-slate-950 md:flex 2xl:w-72">
+      <Link href="/" className="block">
+        <div className="flex h-14 w-full items-center gap-3 border-b border-slate-200/70 px-2 pb-3 dark:border-slate-800">
+          <span className="flex size-10 items-center justify-center rounded-2xl bg-emerald-50 text-primary ring-1 ring-emerald-100">
+            <Bot className="size-6" aria-hidden="true" />
+          </span>
+          <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+            SaveMy<span className="text-primary">Money</span>
           </span>
         </div>
       </Link>
 
-      {/* Navigation */}
-      <div className="flex flex-col items-start justify-center pt-4 px-4">
-        {sidebarItems.map((item) => (
-          <Link key={item.href} href={item.href} className="min-w-full">
-            <Button
-              className="
-                w-full
-                justify-start
-                pl-4
-                py-6
-                text-muted-foreground
-                bg-transparent
-                hover:bg-primary/15
-              "
-            >
-              <item.icon className="size-5" />
-              <span className="font-bold">{item.label}</span>
-            </Button>
-          </Link>
-        ))}
-      </div>
+      <SidebarNavigation />
 
-      {/* Money habits card */}
-      <div className="flex flex-col border max-w-full px-4 mt-10 mx-2 bg-primary/5 rounded-md gap-1 py-4">
-        <h1 className="text-primary font-bold text-lg max-w-[90%]">
+      <div className="mx-1 mt-8 flex max-w-full flex-col gap-1 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-100/80 via-emerald-50 to-white px-4 py-4 shadow-[0_12px_30px_-26px_rgba(5,150,105,0.8)] dark:border-emerald-900/70 dark:from-emerald-950/70 dark:via-slate-900 dark:to-slate-950">
+        <h2 className="max-w-[90%] text-sm font-bold leading-6 text-emerald-950 dark:text-emerald-100">
           Build better money habits{" "}
-          <BicepsFlexed className="text-yellow-500 inline -translate-y-1" />
-        </h1>
-
-        <p className="text-sm font-semibold text-gray-500">
-          Add your first transaction to see your progress
+        </h2>
+        <p className="text-xs leading-5 text-slate-600 dark:text-slate-400">
+          Keep your everyday money in view and moving toward your goals.
         </p>
-
-        <span>
-          <Image
-            src="/Wallet.svg"
-            width={170}
-            height={170}
-            alt="wallet"
-            className="mx-auto"
-          />
-        </span>
-
+        <Image
+          src="/Wallet.svg"
+          width={120}
+          height={120}
+          alt=""
+          aria-hidden="true"
+          className="mx-auto size-28 object-contain"
+        />
         <AddTransactionDialog>
-          <Button>
-            <Plus />
-            Add Transaction
+          <Button className="w-full gap-2 rounded-xl shadow-sm">
+            <Plus className="size-4" />
+            Add transaction
           </Button>
         </AddTransactionDialog>
       </div>
 
-      {/* Bottom section */}
-      <div className="mx-2 max-w-full border-t mb-5 mt-auto pt-10 pl-2 border-gray-200">
-        {/* Logout */}
+      <div className="mx-1 mt-auto max-w-full border-t border-slate-200 pt-4 dark:border-slate-800">
         <form action={logout}>
           <Button
             type="submit"
-            className="
-              bg-transparent
-              text-muted-foreground
-              hover:bg-primary/15
-              gap-2
-              text-md
-              w-full
-              justify-start
-              font-semibold
-            "
+            variant="ghost"
+            className="w-full justify-start gap-3 rounded-xl font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-900"
           >
-            <LogOut className="size-5" />
-            Logout
+            <LogOut className="size-5" aria-hidden="true" />
+            Sign out
           </Button>
         </form>
-
-        {/* User Profile */}
-        <SidebarClient user={user} />
+        <SidebarClient user={session?.user} />
       </div>
-    </div>
+    </aside>
   );
 };
 

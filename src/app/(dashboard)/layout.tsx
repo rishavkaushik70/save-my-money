@@ -1,19 +1,26 @@
 import Header from "@/components/layout/Header/Header";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
+import { SettingsProvider } from "@/components/settings/SettingsProvider";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex bg-background">
-      <Sidebar />
+  const session = await auth.api.getSession({ headers: await headers() });
 
-      <div className="flex-1 min-w-0">
-        <Header />
-        <main>{children}</main>
+  return (
+    <SettingsProvider userId={session?.user.id ?? "local-user"}>
+      <div data-dashboard-shell className="flex min-h-dvh w-full bg-slate-50 dark:bg-slate-950">
+        <Sidebar />
+
+        <div className="min-w-0 flex-1">
+          <Header />
+          <main className="min-w-0">{children}</main>
+        </div>
       </div>
-    </div>
+    </SettingsProvider>
   );
 }

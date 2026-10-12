@@ -61,9 +61,7 @@ const AddMoneyDialog = ({
           <Button
             variant="outline"
             size="sm"
-            className={
-              "w-full sm:w-auto hover:bg-primary hover:text-white transition-all mt-auto"
-            }
+            className="h-11 w-full rounded-xl border-emerald-200 bg-emerald-50 font-semibold text-emerald-800 shadow-sm transition-colors hover:bg-emerald-600 hover:text-white"
           >
             <Plus className="size-4" />
             Add Money

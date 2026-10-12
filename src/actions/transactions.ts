@@ -5,7 +5,106 @@ import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { TransactionOutput } from "@/lib/validators/transactions";
+import {
+  TransactionOutput,
+  transactionSchema,
+} from "@/lib/validators/transactions";
+import type { ExpenseBreakdown, ExpensePeriod } from "@/lib/types/dashboard";
+
+const INDIA_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const EXPENSE_TRANSACTION_PAGE_SIZE = 50;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function getIndiaMonthRange(now = new Date()) {
+  const indiaDate = new Date(now.getTime() + INDIA_OFFSET_MS);
+  const year = indiaDate.getUTCFullYear();
+  const month = indiaDate.getUTCMonth();
+
+  return {
+    start: new Date(Date.UTC(year, month, 1) - INDIA_OFFSET_MS),
+    end: new Date(Date.UTC(year, month + 1, 1) - INDIA_OFFSET_MS),
+  };
+}
+
+function getExpensePeriodRange(period: ExpensePeriod, now = new Date()) {
+  const indiaDate = new Date(now.getTime() + INDIA_OFFSET_MS);
+  const year = indiaDate.getUTCFullYear();
+  const month = indiaDate.getUTCMonth();
+  const day = indiaDate.getUTCDate();
+
+  if (period === "This month") {
+    return getIndiaMonthRange(now);
+  }
+
+  const localDay = new Date(Date.UTC(year, month, day));
+  if (period === "This week") {
+    const daysSinceMonday = (localDay.getUTCDay() + 6) % 7;
+    localDay.setUTCDate(localDay.getUTCDate() - daysSinceMonday);
+  }
+
+  const start = new Date(localDay.getTime() - INDIA_OFFSET_MS);
+  const durationDays = period === "This week" ? 7 : 1;
+  return {
+    start,
+    end: new Date(start.getTime() + durationDays * 24 * 60 * 60 * 1000),
+  };
+}
+
+function getExpenseComparisonRange(period: ExpensePeriod, now = new Date()) {
+  const currentRange = getExpensePeriodRange(period, now);
+  const todayStart = getExpensePeriodRange("Today", now).start;
+  const elapsedDays = Math.max(
+    1,
+    Math.floor((todayStart.getTime() - currentRange.start.getTime()) / DAY_MS) + 1,
+  );
+
+  if (period === "Today") {
+    return {
+      currentRange,
+      elapsedDays,
+      previousRange: {
+        start: new Date(currentRange.start.getTime() - DAY_MS),
+        end: currentRange.start,
+      },
+    };
+  }
+
+  if (period === "This week") {
+    const start = new Date(currentRange.start.getTime() - 7 * DAY_MS);
+    return {
+      currentRange,
+      elapsedDays,
+      previousRange: {
+        start,
+        end: new Date(start.getTime() + elapsedDays * DAY_MS),
+      },
+    };
+  }
+
+  const indiaDate = new Date(now.getTime() + INDIA_OFFSET_MS);
+  const previousMonthStart = new Date(
+    Date.UTC(indiaDate.getUTCFullYear(), indiaDate.getUTCMonth() - 1, 1) -
+      INDIA_OFFSET_MS,
+  );
+  const previousMonthEnd = new Date(
+    Date.UTC(indiaDate.getUTCFullYear(), indiaDate.getUTCMonth(), 1) -
+      INDIA_OFFSET_MS,
+  );
+
+  return {
+    currentRange,
+    elapsedDays,
+    previousRange: {
+      start: previousMonthStart,
+      end: new Date(
+        Math.min(
+          previousMonthStart.getTime() + elapsedDays * DAY_MS,
+          previousMonthEnd.getTime(),
+        ),
+      ),
+    },
+  };
+}
 
 // export data to database
 
@@ -21,7 +120,16 @@ export async function createTransaction(transaction: TransactionOutput) {
         message: "Unauthorized",
       };
     }
-    if (transaction.date > new Date()) {
+    const validation = transactionSchema.safeParse(transaction);
+    if (!validation.success) {
+      return {
+        success: false,
+        message: validation.error.issues[0]?.message ?? "Invalid transaction.",
+      };
+    }
+
+    const validTransaction = validation.data;
+    if (validTransaction.date > new Date()) {
       return {
         success: false,
         message: "Transaction date cannot be in the future.",
@@ -29,12 +137,13 @@ export async function createTransaction(transaction: TransactionOutput) {
     }
     await prisma.transaction.create({
       data: {
-        ...transaction,
+        ...validTransaction,
         userId: session.user.id,
       },
     });
 
     revalidatePath("/dashboard");
+    revalidatePath("/transaction");
     return {
       success: true,
       message: "Transaction added successfully.",
@@ -121,27 +230,92 @@ export async function getTotalExpense() {
 
 // To get expenses on the basis of thier category
 
-export async function getExpensesByCategory() {
+export async function getExpensesByCategory(
+  period: ExpensePeriod = "This month",
+  category?: string,
+  offset = 0,
+): Promise<ExpenseBreakdown> {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
-    return [];
+    return {
+      categories: [],
+      transactions: [],
+      hasMoreTransactions: false,
+      totalExpense: 0,
+      transactionCount: 0,
+      dailyAverage: 0,
+      previousPeriodExpense: 0,
+    };
   }
 
-  const expenses = await prisma.transaction.groupBy({
-    by: ["category"],
-    where: {
-      userId: session.user.id,
-      type: "EXPENSE",
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+  const safePeriod: ExpensePeriod = ["This month", "This week", "Today"].includes(period)
+    ? period
+    : "This month";
+  const safeOffset =
+    Number.isInteger(offset) && offset >= 0 && offset <= 10_000 ? offset : 0;
+  const { currentRange, previousRange, elapsedDays } = getExpenseComparisonRange(safePeriod);
+  const where = {
+    userId: session.user.id,
+    type: "EXPENSE" as const,
+    date: { gte: currentRange.start, lt: currentRange.end },
+  };
+  const previousWhere = {
+    userId: session.user.id,
+    type: "EXPENSE" as const,
+    date: { gte: previousRange.start, lt: previousRange.end },
+  };
 
-  return expenses;
+  const [categoryTotals, matchingTransactions, currentSummary, previousSummary] = await Promise.all([
+    prisma.transaction.groupBy({
+      by: ["category"],
+      where,
+      _sum: { amount: true },
+      orderBy: { _sum: { amount: "desc" } },
+    }),
+    category
+      ? prisma.transaction.findMany({
+          where: { ...where, category },
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            amount: true,
+            date: true,
+          },
+          orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+          skip: safeOffset,
+          take: EXPENSE_TRANSACTION_PAGE_SIZE + 1,
+        })
+      : Promise.resolve([]),
+    prisma.transaction.aggregate({
+      where,
+      _sum: { amount: true },
+      _count: { _all: true },
+    }),
+    prisma.transaction.aggregate({
+      where: previousWhere,
+      _sum: { amount: true },
+    }),
+  ]);
+
+  const totalExpense = currentSummary._sum.amount ?? 0;
+
+  return {
+    categories: categoryTotals.map(({ category, _sum }) => ({
+      category,
+      amount: _sum.amount ?? 0,
+    })),
+    transactions: matchingTransactions.slice(0, EXPENSE_TRANSACTION_PAGE_SIZE),
+    hasMoreTransactions:
+      matchingTransactions.length > EXPENSE_TRANSACTION_PAGE_SIZE,
+    totalExpense,
+    transactionCount: currentSummary._count._all,
+    dailyAverage: totalExpense / elapsedDays,
+    previousPeriodExpense: previousSummary._sum.amount ?? 0,
+  };
 }
 
 // To get total monthy savings
@@ -155,11 +329,7 @@ export async function getMonthlySavings() {
     return 0;
   }
 
-  const now = new Date();
-
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const { start, end } = getIndiaMonthRange();
 
   const [income, expense] = await Promise.all([
     prisma.transaction.aggregate({
@@ -167,8 +337,8 @@ export async function getMonthlySavings() {
         userId: session.user.id,
         type: "INCOME",
         date: {
-          gte: startOfMonth,
-          lt: startOfNextMonth,
+          gte: start,
+          lt: end,
         },
       },
       _sum: {
@@ -181,8 +351,8 @@ export async function getMonthlySavings() {
         userId: session.user.id,
         type: "EXPENSE",
         date: {
-          gte: startOfMonth,
-          lt: startOfNextMonth,
+          gte: start,
+          lt: end,
         },
       },
       _sum: {
