@@ -31,7 +31,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TRANSACTION_TYPES } from "@/lib/constants/transaction";
 import { Controller } from "react-hook-form";
-import { createTransaction } from "@/actions/transactions";
+import { useEffect } from "react";
+import { createTransaction, updateTransaction } from "@/actions/transactions";
 import { toast } from "sonner";
 
 const items = [
@@ -44,33 +45,88 @@ const items = [
   { label: "Food", value: "Food" },
 ];
 
+export function formatDateForInput(date?: unknown): string {
+  if (!date) return new Date().toISOString().split("T")[0];
+  if (typeof date === "string" || typeof date === "number" || date instanceof Date) {
+    const d = new Date(date);
+    if (!isNaN(d.getTime())) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+  }
+  return new Date().toISOString().split("T")[0];
+}
+
+export type TransactionFormData = {
+  id?: string;
+  title: string;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+  category: string;
+  date: Date | string;
+  description?: string | null;
+};
+
 type AddTransactionFormProps = {
+  initialData?: TransactionFormData | null;
   onSuccess?: () => void;
 };
 
-const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
+const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps) => {
+  const isEdit = Boolean(initialData?.id);
+
+  const form = useForm<TransactionInput, undefined, TransactionOutput>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      title: initialData?.title ?? "",
+      amount: initialData?.amount ?? ("" as unknown as number),
+      description: initialData?.description ?? "",
+      date: initialData?.date ? new Date(initialData.date) : new Date(),
+      type: initialData?.type ?? TRANSACTION_TYPES.INCOME,
+      category: initialData?.category ?? "",
+    },
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        title: initialData.title,
+        amount: initialData.amount,
+        description: initialData.description ?? "",
+        date: initialData.date ? new Date(initialData.date) : new Date(),
+        type: initialData.type,
+        category: initialData.category,
+      });
+    } else {
+      form.reset({
+        title: "",
+        amount: "" as unknown as number,
+        description: "",
+        date: new Date(),
+        type: TRANSACTION_TYPES.INCOME,
+        category: "",
+      });
+    }
+  }, [initialData, form]);
+
   const onSubmit = async (data: TransactionOutput) => {
-    const result = await createTransaction(data);
+    const result = isEdit && initialData?.id
+      ? await updateTransaction(initialData.id, data)
+      : await createTransaction(data);
+
     if (!result.success) {
       toast.error(result.message);
       return;
     }
 
     toast.success(result.message);
-    form.reset();
+    if (!isEdit) {
+      form.reset();
+    }
     onSuccess?.();
   };
-  const form = useForm<TransactionInput, undefined, TransactionOutput>({
-    resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      title: "",
-      amount: "" as unknown as number,
-      description: "",
-      date: new Date(),
-      type: TRANSACTION_TYPES.INCOME,
-      category: "",
-    },
-  });
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="space-y-4">
@@ -194,14 +250,27 @@ const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
         </Field>
         <Field>
           <Label htmlFor="transaction-date">Date</Label>
-          <Input
-            id="transaction-date"
-            type="date"
-            max={new Date().toISOString().split("T")[0]}
-            {...form.register("date", {
-              valueAsDate: true,
-            })}
+          <Controller
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <Input
+                id="transaction-date"
+                type="date"
+                max={new Date().toISOString().split("T")[0]}
+                value={formatDateForInput(field.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  field.onChange(val ? new Date(`${val}T00:00:00`) : new Date());
+                }}
+              />
+            )}
           />
+          {form.formState.errors.date && (
+            <p className="text-sm text-red-500">
+              {form.formState.errors.date.message}
+            </p>
+          )}
         </Field>
         <Field>
           <Label htmlFor="description">Description (Optional)</Label>
@@ -228,7 +297,11 @@ const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
         />
 
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Saving..." : "Save Transaction"}
+          {form.formState.isSubmitting
+            ? "Saving..."
+            : isEdit
+            ? "Update Transaction"
+            : "Save Transaction"}
         </Button>
       </DialogFooter>
     </form>

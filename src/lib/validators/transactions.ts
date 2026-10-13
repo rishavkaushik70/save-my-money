@@ -11,7 +11,7 @@ export const transactionSchema = z.object({
     .positive("Amount must be greater than 0")
     .max(MAX_TRANSACTION_AMOUNT, "A transaction cannot exceed ₹10,00,000."),
   category: z.string().trim().min(2, "Category must be at least 2 characters"),
-  date: z.coerce.date().max(new Date(), {
+  date: z.coerce.date().refine((date) => date.getTime() <= Date.now() + 60_000, {
     message: "Transaction date cannot be in the future",
   }),
   description: z.string().trim().optional(),

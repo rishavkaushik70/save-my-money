@@ -38,6 +38,7 @@ import {
   Zap,
   User,
   Apple,
+  Pencil,
 } from "lucide-react";
 
 import { Transaction } from "@/generated/prisma/client";
@@ -47,6 +48,7 @@ import { useMemo, useState } from "react";
 import TransactionFilters from "../TransactionFilters/TransactionFilters";
 import TransactionPagination from "../TransactionPagination/TransactionPagination";
 import { deleteTransaction } from "@/actions/transactions";
+import { TransactionDialog } from "../AddTransactionDialog/add-transaction-dialog";
 
 const categoryConfig = {
   Shopping: {
@@ -242,6 +244,9 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
   const [transactionToDelete, setTransactionToDelete] =
     useState<Transaction | null>(null);
 
+  const [transactionToEdit, setTransactionToEdit] =
+    useState<Transaction | null>(null);
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -417,6 +422,15 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
 
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            onClick={() => {
+                              setTransactionToEdit(data);
+                            }}
+                          >
+                            <Pencil className="size-4" />
+                            Edit
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
                             variant="destructive"
                             onClick={() => {
                               setTransactionToDelete(data);
@@ -478,6 +492,16 @@ const TransactionList = ({ allTransaction }: TransactionListProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <TransactionDialog
+        transaction={transactionToEdit}
+        open={transactionToEdit !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTransactionToEdit(null);
+          }
+        }}
+      />
     </div>
   );
 };

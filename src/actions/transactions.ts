@@ -129,7 +129,7 @@ export async function createTransaction(transaction: TransactionOutput) {
     }
 
     const validTransaction = validation.data;
-    if (validTransaction.date > new Date()) {
+    if (validTransaction.date.getTime() > Date.now() + 60_000) {
       return {
         success: false,
         message: "Transaction date cannot be in the future.",
@@ -144,6 +144,7 @@ export async function createTransaction(transaction: TransactionOutput) {
 
     revalidatePath("/dashboard");
     revalidatePath("/transaction");
+    revalidatePath("/reports");
     return {
       success: true,
       message: "Transaction added successfully.",
@@ -426,6 +427,7 @@ export async function deleteTransaction(transactionId: string) {
 
     revalidatePath("/dashboard");
     revalidatePath("/transaction");
+    revalidatePath("/reports");
 
     return {
       success: true,
@@ -437,6 +439,96 @@ export async function deleteTransaction(transactionId: string) {
     return {
       success: false,
       message: "Something went wrong",
+    };
+  }
+}
+
+// Update existing transaction
+export async function updateTransaction(
+  transactionId: string,
+  transaction: TransactionOutput
+) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return {
+        success: false,
+        message: "Unauthorized",
+      };
+    }
+
+    if (!transactionId || typeof transactionId !== "string") {
+      return {
+        success: false,
+        message: "Invalid transaction ID.",
+      };
+    }
+
+    const validation = transactionSchema.safeParse(transaction);
+    if (!validation.success) {
+      return {
+        success: false,
+        message:
+          validation.error.issues[0]?.message ?? "Invalid transaction details.",
+      };
+    }
+
+    const validTransaction = validation.data;
+    if (validTransaction.date.getTime() > Date.now() + 60_000) {
+      return {
+        success: false,
+        message: "Transaction date cannot be in the future.",
+      };
+    }
+
+    // Verify ownership: ensure the transaction exists and belongs strictly to the authenticated user
+    const existingTransaction = await prisma.transaction.findFirst({
+      where: {
+        id: transactionId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!existingTransaction) {
+      return {
+        success: false,
+        message: "Transaction not found or you do not have permission to edit it.",
+      };
+    }
+
+    // Update only permitted editable fields
+    await prisma.transaction.update({
+      where: {
+        id: transactionId,
+      },
+      data: {
+        title: validTransaction.title,
+        amount: validTransaction.amount,
+        type: validTransaction.type,
+        category: validTransaction.category,
+        date: validTransaction.date,
+        description: validTransaction.description ?? null,
+      },
+    });
+
+    // Invalidate affected data caches to trigger aggregate recalculation
+    revalidatePath("/dashboard");
+    revalidatePath("/transaction");
+    revalidatePath("/reports");
+
+    return {
+      success: true,
+      message: "Transaction updated successfully.",
+    };
+  } catch (error) {
+    console.error("Update Transaction Error:", error);
+
+    return {
+      success: false,
+      message: "Something went wrong while updating the transaction.",
     };
   }
 }
