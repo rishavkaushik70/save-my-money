@@ -55,7 +55,7 @@ const SignInForm = () => {
               autoComplete="email"
               placeholder="you@example.com"
               aria-invalid={Boolean(form.formState.errors.email)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("email")}
             />
           </div>
@@ -74,7 +74,7 @@ const SignInForm = () => {
               autoComplete="current-password"
               placeholder="Enter your password"
               aria-invalid={Boolean(form.formState.errors.password)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("password")}
             />
           </div>

@@ -3,6 +3,7 @@ import ProfileSection from "./Profile/ProfileSection";
 import PreferencesSection from "./Preference/PreferencesSection";
 import AppearanceSection from "./Appearance/AppearanceSection";
 import SecuritySection from "./Security/SecuritySection";
+import BillingSection from "./Billing/BillingSection";
 import DangerZone from "./DangerZone/DangerZone";
 
 interface SettingsPageProps {
@@ -24,12 +25,13 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
                 Settings
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300 sm:text-base">
-                Fine-tune your profile, money alerts, and the way your workspace feels.
+                Fine-tune your profile, subscription plan, money alerts, and workspace settings.
               </p>
             </div>
             <nav aria-label="Settings sections" className="flex flex-wrap gap-2">
               {[
                 ["Profile", "#profile"],
+                ["Subscription", "#billing"],
                 ["Preferences", "#preferences"],
                 ["Appearance", "#appearance"],
                 ["Security", "#security"],
@@ -49,6 +51,9 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         <div className="grid min-w-0 gap-5 lg:grid-cols-2 lg:gap-6">
           <div id="profile" className="scroll-mt-24 lg:col-span-2">
             <ProfileSection user={user} />
+          </div>
+          <div id="billing" className="scroll-mt-24 lg:col-span-2">
+            <BillingSection />
           </div>
           <div id="preferences" className="scroll-mt-24">
             <PreferencesSection />

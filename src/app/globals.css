@@ -464,10 +464,69 @@
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
-.landing-shell .feature-card:hover,
-.landing-shell .testimonial-card:hover {
+.landing-shell .feature-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--lp-shadow);
+}
+
+.landing-shell .testimonial-card {
+  box-shadow: 0 4px 20px rgb(0 0 0 / 4%);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.landing-shell[data-theme="dark"] .testimonial-card {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 22%);
+}
+
+.landing-shell .testimonial-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--lp-accent) 45%, var(--lp-border));
+  box-shadow: var(--lp-shadow);
+}
+
+/* Reviews marquee horizontal infinite slider */
+@keyframes reviews-marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.landing-shell .reviews-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: reviews-marquee-left 36s linear infinite;
+  will-change: transform;
+}
+
+.landing-shell .reviews-marquee-track:hover,
+.landing-shell .reviews-marquee-container:hover .reviews-marquee-track {
+  animation-play-state: paused;
+}
+
+.landing-shell .reviews-mask {
+  mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+  .landing-shell .reviews-mask {
+    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  }
+  .landing-shell .reviews-marquee-track {
+    animation-duration: 28s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-shell .reviews-marquee-track {
+    animation: none;
+    overflow-x: auto;
+    width: 100%;
+  }
 }
 
 .landing-shell .pricing-card-popular {
@@ -681,6 +740,10 @@
   transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 
+.landing-shell .auth-field:hover {
+  border-color: color-mix(in srgb, var(--lp-accent) 35%, var(--lp-border));
+}
+
 .landing-shell .auth-field:focus-within {
   border-color: var(--lp-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lp-accent) 14%, transparent);
@@ -688,10 +751,34 @@
 
 .landing-shell .auth-input {
   color: var(--lp-fg);
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.landing-shell .auth-input:focus,
+.landing-shell .auth-input:focus-visible {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .landing-shell .auth-input::placeholder {
   color: var(--lp-muted);
+}
+
+/* Seamless browser autofill styling matching dark and light mode */
+.landing-shell .auth-input:-webkit-autofill,
+.landing-shell .auth-input:-webkit-autofill:hover,
+.landing-shell .auth-input:-webkit-autofill:focus,
+.landing-shell .auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--lp-fg) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--lp-raised) inset !important;
+  box-shadow: 0 0 0 1000px var(--lp-raised) inset !important;
+  transition: background-color 99999s ease-in-out 0s !important;
+  background-color: transparent !important;
 }
 
 .landing-shell .auth-submit {

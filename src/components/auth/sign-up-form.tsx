@@ -56,7 +56,7 @@ export default function SignUpForm() {
               autoComplete="name"
               placeholder="Your name"
               aria-invalid={Boolean(form.formState.errors.name)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("name")}
             />
           </div>
@@ -75,7 +75,7 @@ export default function SignUpForm() {
               autoComplete="email"
               placeholder="you@example.com"
               aria-invalid={Boolean(form.formState.errors.email)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("email")}
             />
           </div>
@@ -94,7 +94,7 @@ export default function SignUpForm() {
               autoComplete="new-password"
               placeholder="Create a password"
               aria-invalid={Boolean(form.formState.errors.password)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("password")}
             />
           </div>
@@ -113,7 +113,7 @@ export default function SignUpForm() {
               autoComplete="new-password"
               placeholder="Confirm your password"
               aria-invalid={Boolean(form.formState.errors.confirmPassword)}
-              className="auth-input h-12 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="auth-input h-12 border-0 bg-transparent dark:bg-transparent px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               {...form.register("confirmPassword")}
             />
           </div>

@@ -8,7 +8,9 @@ import {
   ArrowUpRight,
   CalendarRange,
   ChartNoAxesCombined,
+  Crown,
   Download,
+  Lock,
   PiggyBank,
   ReceiptText,
   Sparkles,
@@ -16,6 +18,8 @@ import {
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { toast } from "sonner";
+import { exportReportData } from "@/actions/reports";
 import {
   Bar,
   BarChart,
@@ -63,6 +67,9 @@ type ReportsPageProps = {
   transactions: ReportTransaction[];
   goals: ReportGoal[];
   asOf: Date;
+  hasAdvancedReports?: boolean;
+  hasExportReports?: boolean;
+  tier?: string;
 };
 type TrendPoint = {
   label: string;
@@ -242,8 +249,16 @@ function MetricCard({
   );
 }
 
-function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
+function ReportsPage({
+  transactions,
+  goals,
+  asOf,
+  hasAdvancedReports = true,
+  hasExportReports = false,
+  tier = "FREE",
+}: ReportsPageProps) {
   const [range, setRange] = useState<ReportRange>("LAST_6_MONTHS");
+  const [isExporting, setIsExporting] = useState(false);
   const selectedRangeLabel = rangeLabel(range);
   const start = useMemo(() => getRangeStart(range, asOf), [range, asOf]);
 
@@ -313,30 +328,40 @@ function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
       ? Math.min(100, (totalGoalSaved / totalGoalTarget) * 100)
       : 0;
 
-  const handleExport = () => {
-    const escapeCsv = (value: string | number) =>
-      `"${String(value).replaceAll('"', '""')}"`;
-    const rows = [
-      ["Date", "Title", "Category", "Type", "Amount"],
-      ...periodTransactions.map((transaction) => [
-        new Date(transaction.date).toLocaleDateString("en-IN"),
-        transaction.title,
-        transaction.category,
-        transaction.type === "INCOME" ? "Income" : "Expense",
-        transaction.amount,
-      ]),
-    ];
-    const csv = rows.map((row) => row.map(escapeCsv).join(",")).join("\r\n");
-    const url = URL.createObjectURL(
-      new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }),
-    );
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `save-my-money-${range.toLowerCase()}.csv`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const handleExport = async () => {
+    if (!hasExportReports) {
+      toast.error(
+        "Exporting reports is an exclusive feature of the Premium plan (₹999/mo). Please upgrade to Premium."
+      );
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      const result = await exportReportData("csv");
+      if (!result.success || !result.data) {
+        toast.error(result.error || "Failed to export report data.");
+        return;
+      }
+
+      const url = URL.createObjectURL(
+        new Blob([`\uFEFF${result.data}`], { type: "text/csv;charset=utf-8" })
+      );
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download =
+        result.filename || `save-my-money-report-${range.toLowerCase()}.csv`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast.success("Report data exported successfully!");
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("An error occurred during export.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -345,7 +370,7 @@ function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
         <div className="min-w-0">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
             <ChartNoAxesCombined className="size-3.5" aria-hidden="true" />
-            Your money, in focus
+            Your money, in focus · {tier} Plan
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl dark:text-slate-100">
             Financial reports
@@ -383,10 +408,16 @@ function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
             variant="outline"
             className="h-11 rounded-xl border-emerald-200 bg-white text-emerald-800 shadow-sm hover:bg-emerald-50 dark:border-emerald-900 dark:bg-slate-900/70 dark:text-emerald-300 dark:hover:bg-emerald-950/50"
             onClick={handleExport}
-            disabled={!hasTransactions}
+            disabled={!hasTransactions || isExporting}
           >
             <Download aria-hidden="true" />
-            Export CSV
+            {isExporting ? "Exporting…" : "Export CSV"}
+            {!hasExportReports && (
+              <span className="ml-1 inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                <Crown className="size-2.5" />
+                Premium
+              </span>
+            )}
           </Button>
         </div>
       </header>
@@ -425,7 +456,36 @@ function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
         />
       </section>
 
-      <section className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.85fr)]">
+      {!hasAdvancedReports ? (
+        <section className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-emerald-50/40 to-white p-7 text-center shadow-sm dark:border-slate-800 dark:from-[#111b16] dark:via-[#102a20]/40 dark:to-[#111b16] sm:p-12">
+          <div className="mx-auto flex max-w-lg flex-col items-center">
+            <span className="flex size-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-xs dark:bg-emerald-950/80 dark:text-emerald-300">
+              <Lock className="size-7" />
+            </span>
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-100/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
+              <Crown className="size-3.5" />
+              Pro & Premium Analytics
+            </div>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl dark:text-slate-100">
+              Unlock Advanced Analytics & Trends
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              You are currently viewing basic summary metrics. Upgrade to <strong>Pro (₹499/mo)</strong> or <strong>Premium</strong> to unlock interactive income vs expenses bar charts, monthly cash flow trends, category distributions, and automated savings analysis.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/pricing"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+              >
+                <Sparkles className="size-4" />
+                Upgrade to Pro
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <>
+          <section className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.85fr)]">
         <article className="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-5 dark:border-slate-800 dark:bg-[#111b16]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -810,6 +870,8 @@ function ReportsPage({ transactions, goals, asOf }: ReportsPageProps) {
           </div>
         </article>
       </section>
+        </>
+      )}
     </div>
   );
 }

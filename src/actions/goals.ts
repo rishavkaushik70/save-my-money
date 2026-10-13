@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { GoalOutput } from "@/lib/validators/goals";
+import { canUserCreateGoal } from "@/lib/subscriptions/entitlements";
 
 // Create New goal
 
@@ -19,6 +20,17 @@ export async function createGoal(goal: GoalOutput) {
       return {
         success: false,
         message: "Unauthorized",
+      };
+    }
+
+    // Enforce server-side entitlement check
+    const goalAllowance = await canUserCreateGoal(session.user.id);
+    if (!goalAllowance.allowed) {
+      return {
+        success: false,
+        message:
+          goalAllowance.message ??
+          "Your current plan goal limit has been reached. Please upgrade to Pro for unlimited goals.",
       };
     }
     await prisma.goal.create({

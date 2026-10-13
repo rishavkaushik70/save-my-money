@@ -19,7 +19,7 @@ const Footer = () => {
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">Explore</p>
             <Link className="landing-footer-link" href="#features">Features</Link>
             <Link className="landing-footer-link" href="#howItWorks">Product</Link>
-            <Link className="landing-footer-link" href="#pricing">Pricing</Link>
+            <Link className="landing-footer-link" href="/pricing">Pricing</Link>
           </div>
           <div className="flex flex-col gap-3 text-sm">
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em]">Account</p>
