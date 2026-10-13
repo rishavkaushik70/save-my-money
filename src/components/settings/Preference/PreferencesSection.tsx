@@ -68,7 +68,7 @@ const PreferencesSection = () => {
         </div>
 
         {settings.monthlyExpenseAlerts && (
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-900/60 dark:bg-emerald-950/20">
+          <div className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-900/60 dark:bg-emerald-950/20">
             <div className="flex items-start gap-3">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm dark:bg-slate-900 dark:text-emerald-300">
                 <WalletCards className="size-4" aria-hidden="true" />

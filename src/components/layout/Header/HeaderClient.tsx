@@ -58,15 +58,18 @@ const navItems = [
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
+import { SubscriptionTierType } from "@/lib/subscriptions/config";
+
 interface HeaderClientProps {
   user?: {
     name: string;
     email: string;
     image?: string | null;
   };
+  tier?: SubscriptionTierType;
 }
 
-const HeaderClient = ({ user }: HeaderClientProps) => {
+const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
   const pathname = usePathname();
   const { avatarImage, avatarCustomized } = usePersonalSettings();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -271,10 +274,15 @@ const HeaderClient = ({ user }: HeaderClientProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900">
-                      {user.name}
-                    </p>
-                    <p className="truncate text-xs text-slate-500">{user.email}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        {user.name}
+                      </p>
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                        {tier === "PREMIUM" ? "Premium" : tier === "PRO" ? "Pro" : "Free"}
+                      </span>
+                    </div>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
                   </div>
                 </div>
               )}

@@ -75,10 +75,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Malformed JSON payload." }, { status: 400 });
   }
 
-  // Generate or extract unique event identifier for idempotency
+  const subEntity = payload.payload?.subscription?.entity;
+  const subId = subEntity?.id || "unknown";
+
+  // Generate deterministic event identifier for idempotency (same signature = same payload)
   const eventId =
     req.headers.get("x-razorpay-event-id") ||
-    `${payload.event}_${payload.payload?.subscription?.entity?.id || Date.now()}_${signature.slice(0, 16)}`;
+    `${payload.event}_${subId}_${signature.slice(0, 32)}`;
 
   // 2. Strict Idempotency Check
   const existingEvent = await prisma.webhookEvent.findUnique({
@@ -107,27 +110,36 @@ export async function POST(req: NextRequest) {
     console.warn("Could not record webhook idempotency entry:", recordErr);
   }
 
-  const subEntity = payload.payload?.subscription?.entity;
   if (!subEntity?.id) {
     // Event may be payment-only or unrelated; acknowledge 200
     return NextResponse.json({ received: true, ignored: true });
   }
 
-  const subId = subEntity.id;
   const currentStart = subEntity.current_start ? new Date(subEntity.current_start * 1000) : null;
   const currentEnd = subEntity.current_end ? new Date(subEntity.current_end * 1000) : null;
-  const noteTier = (subEntity.notes?.tier?.toUpperCase() as SubscriptionTier) || "PRO";
+  const customerId = (subEntity as { customer_id?: string }).customer_id || null;
+
+  // Retrieve current subscription record from DB to preserve tier if notes are absent in webhook
+  const existingSub = await prisma.subscription.findFirst({
+    where: { providerSubscriptionId: subId },
+  });
+
+  const noteTierRaw = subEntity.notes?.tier?.toUpperCase();
+  const effectiveTier: SubscriptionTier =
+    noteTierRaw === "PRO" || noteTierRaw === "PREMIUM"
+      ? (noteTierRaw as SubscriptionTier)
+      : (existingSub?.tier ?? SubscriptionTier.PRO);
 
   // 3. Process Subscription Lifecycle Events
   try {
     switch (payload.event) {
-      case "subscription.authenticated":
-      case "subscription.activated": {
+      case "subscription.authenticated": {
         await prisma.subscription.updateMany({
           where: { providerSubscriptionId: subId },
           data: {
-            status: SubscriptionStatus.ACTIVE,
-            tier: noteTier,
+            status: SubscriptionStatus.AUTHENTICATED,
+            tier: effectiveTier,
+            providerCustomerId: customerId ?? existingSub?.providerCustomerId,
             currentPeriodStart: currentStart ?? new Date(),
             currentPeriodEnd: currentEnd ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             cancelAtPeriodEnd: false,
@@ -136,14 +148,17 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case "subscription.activated":
       case "subscription.charged": {
         await prisma.subscription.updateMany({
           where: { providerSubscriptionId: subId },
           data: {
             status: SubscriptionStatus.ACTIVE,
-            tier: noteTier,
+            tier: effectiveTier,
+            providerCustomerId: customerId ?? existingSub?.providerCustomerId,
             currentPeriodStart: currentStart ?? new Date(),
             currentPeriodEnd: currentEnd ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            cancelAtPeriodEnd: false,
           },
         });
         break;
@@ -153,7 +168,7 @@ export async function POST(req: NextRequest) {
         await prisma.subscription.updateMany({
           where: { providerSubscriptionId: subId },
           data: {
-            status: SubscriptionStatus.PENDING,
+            status: SubscriptionStatus.PAST_DUE,
           },
         });
         break;
@@ -169,20 +184,45 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      case "subscription.cancelled": {
-        const sub = await prisma.subscription.findFirst({
+      case "subscription.paused": {
+        await prisma.subscription.updateMany({
           where: { providerSubscriptionId: subId },
+          data: {
+            status: SubscriptionStatus.PAUSED,
+          },
         });
+        break;
+      }
 
-        if (sub) {
+      case "subscription.resumed": {
+        await prisma.subscription.updateMany({
+          where: { providerSubscriptionId: subId },
+          data: {
+            status: SubscriptionStatus.ACTIVE,
+          },
+        });
+        break;
+      }
+
+      case "subscription.cancelled": {
+        if (existingSub) {
           // If cancelled at cycle end and currentPeriodEnd is in the future, retain ACTIVE until period ends
-          const isFuture = sub.currentPeriodEnd && sub.currentPeriodEnd > new Date();
+          const isFuture = existingSub.currentPeriodEnd && existingSub.currentPeriodEnd > new Date();
           await prisma.subscription.update({
-            where: { id: sub.id },
+            where: { id: existingSub.id },
             data: {
               cancelAtPeriodEnd: true,
               cancelledAt: new Date(),
               status: isFuture ? SubscriptionStatus.ACTIVE : SubscriptionStatus.CANCELLED,
+            },
+          });
+        } else {
+          await prisma.subscription.updateMany({
+            where: { providerSubscriptionId: subId },
+            data: {
+              status: SubscriptionStatus.CANCELLED,
+              cancelAtPeriodEnd: true,
+              cancelledAt: new Date(),
             },
           });
         }

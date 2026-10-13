@@ -90,6 +90,13 @@ export async function createCheckoutSession(
           code: "ALREADY_SUBSCRIBED",
         };
       }
+      if (existingSub.tier === "PREMIUM" && tier === "PRO") {
+        return {
+          success: false,
+          error: "You already have an active Premium subscription. Plan downgrades take effect after your current billing cycle.",
+          code: "ALREADY_SUBSCRIBED",
+        };
+      }
     }
 
     const planId = getRazorpayPlanId(tier);
@@ -112,6 +119,27 @@ export async function createCheckoutSession(
       };
     }
 
+    // Reuse recent pending checkout session if created within the last 15 minutes for the same plan
+    const isRecentPending =
+      existingSub &&
+      existingSub.status === "PENDING" &&
+      existingSub.providerPlanId === planId &&
+      Boolean(existingSub.providerSubscriptionId) &&
+      Date.now() - existingSub.updatedAt.getTime() < 15 * 60 * 1000;
+
+    if (isRecentPending && existingSub.providerSubscriptionId) {
+      return {
+        success: true,
+        subscriptionId: existingSub.providerSubscriptionId,
+        keyId,
+        planName: plan.name,
+        amount: plan.price,
+        currency: plan.currency,
+        userName: session.user.name,
+        userEmail: session.user.email,
+      };
+    }
+
     const razorpay = getRazorpayClient();
 
     // Create subscription on Razorpay (12 monthly billing cycles)
@@ -127,7 +155,7 @@ export async function createCheckoutSession(
       },
     })) as { id: string };
 
-    // Record pending subscription in local DB linked to user
+    // Record pending subscription in local DB linked to authenticated user
     await prisma.subscription.upsert({
       where: { userId: session.user.id },
       create: {
@@ -172,6 +200,7 @@ export async function createCheckoutSession(
 
 /**
  * Server-side payment verification for Razorpay Subscription checkout response.
+ * Strictly verifies using the subscription ID retrieved from our own database.
  */
 export async function verifySubscriptionPayment(payload: {
   razorpayPaymentId: string;
@@ -197,13 +226,38 @@ export async function verifySubscriptionPayment(payload: {
       razorpayPaymentId,
       razorpaySubscriptionId,
       razorpaySignature,
-      tier,
     } = validation.data;
 
-    // Verify cryptographic signature
+    // 1. Retrieve subscription record from our own database for the authenticated user
+    const subRecord = await prisma.subscription.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!subRecord || !subRecord.providerSubscriptionId) {
+      return {
+        success: false,
+        error: "No active subscription session found for your account. Please initiate checkout again.",
+      };
+    }
+
+    // 2. Validate that client returned subscription ID matches the subscription ID from our database
+    if (subRecord.providerSubscriptionId !== razorpaySubscriptionId) {
+      console.error(
+        "Subscription mismatch! User DB:",
+        subRecord.providerSubscriptionId,
+        "Received:",
+        razorpaySubscriptionId
+      );
+      return {
+        success: false,
+        error: "Subscription identifier mismatch. Payment verification aborted.",
+      };
+    }
+
+    // 3. Cryptographically verify signature using subscription ID retrieved from our own database
     const isValidSignature = verifySubscriptionPaymentSignature({
       razorpayPaymentId,
-      razorpaySubscriptionId,
+      razorpaySubscriptionId: subRecord.providerSubscriptionId,
       razorpaySignature,
     });
 
@@ -211,37 +265,30 @@ export async function verifySubscriptionPayment(payload: {
       console.error(
         "Invalid Razorpay subscription signature for user:",
         session.user.id,
-        razorpaySubscriptionId
+        subRecord.providerSubscriptionId
       );
-      return { success: false, error: "Payment verification failed. Invalid signature." };
-    }
-
-    // Verify subscription belongs to this user in DB
-    const subRecord = await prisma.subscription.findFirst({
-      where: {
-        userId: session.user.id,
-        providerSubscriptionId: razorpaySubscriptionId,
-      },
-    });
-
-    if (!subRecord) {
       return {
         success: false,
-        error: "Subscription record mismatch. Please contact support.",
+        error: "Payment verification failed. Invalid digital signature.",
       };
     }
 
-    // Attempt to fetch fresh period start/end from Razorpay
+    // 4. Resolve authoritative tier from database record created during session initialization
+    const authoritativeTier = subRecord.tier;
+
+    // 5. Query Razorpay API for remote period start/end and customer identifier
     let periodStart = new Date();
-    let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days default
+    let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30-day default
+    let customerId = subRecord.providerCustomerId;
 
     try {
       const razorpay = getRazorpayClient();
       const details = (await razorpay.subscriptions.fetch(
-        razorpaySubscriptionId
+        subRecord.providerSubscriptionId
       )) as {
         current_start?: number;
         current_end?: number;
+        customer_id?: string;
       };
 
       if (details.current_start) {
@@ -250,16 +297,20 @@ export async function verifySubscriptionPayment(payload: {
       if (details.current_end) {
         periodEnd = new Date(details.current_end * 1000);
       }
+      if (details.customer_id) {
+        customerId = details.customer_id;
+      }
     } catch (fetchErr) {
-      console.warn("Could not fetch remote subscription period end, using 30d fallback:", fetchErr);
+      console.warn("Could not fetch remote subscription period details, using defaults:", fetchErr);
     }
 
-    // Activate subscription in DB
+    // 6. Idempotently update database record to ACTIVE
     await prisma.subscription.update({
       where: { id: subRecord.id },
       data: {
         status: "ACTIVE",
-        tier,
+        tier: authoritativeTier,
+        providerCustomerId: customerId,
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: false,
@@ -275,7 +326,7 @@ export async function verifySubscriptionPayment(payload: {
 
     return {
       success: true,
-      message: `Congratulations! Your ${tier} subscription is now active.`,
+      message: `Congratulations! Your ${authoritativeTier} subscription is now active.`,
     };
   } catch (error) {
     console.error("Verify Subscription Payment Error:", error);

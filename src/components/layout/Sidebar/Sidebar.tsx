@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 
 import { logout } from "@/actions/auth";
 import { auth } from "@/lib/auth";
+import { getUserEntitlements } from "@/lib/subscriptions/entitlements";
 import { Button } from "@/components/ui/button";
 import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog/add-transaction-dialog";
 
@@ -13,6 +14,8 @@ import SidebarNavigation from "./SidebarNavigation";
 
 const Sidebar = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
+  const entitlements = session ? await getUserEntitlements(session.user.id) : null;
+  const currentTier = entitlements?.tier ?? "FREE";
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-200/80 bg-[#fbfdfc] px-3 py-4 dark:border-slate-800 dark:bg-slate-950 md:flex 2xl:w-72">
@@ -63,7 +66,7 @@ const Sidebar = async () => {
             Sign out
           </Button>
         </form>
-        <SidebarClient user={session?.user} />
+        <SidebarClient user={session?.user} tier={currentTier} />
       </div>
     </aside>
   );

@@ -118,7 +118,7 @@ const Pricing = () => {
         subscription_id: res.subscriptionId,
         name: "SaveMyMoney",
         description: `${res.planName} Monthly Subscription`,
-        image: "/icon.png",
+        image: "/Wallet.svg",
         prefill: {
           name: res.userName,
           email: res.userEmail,
