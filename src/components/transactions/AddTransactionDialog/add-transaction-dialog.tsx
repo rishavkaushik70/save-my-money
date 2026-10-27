@@ -15,6 +15,7 @@ export type TransactionDialogProps = {
   transaction?: TransactionFormData | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onSuccess?: () => void;
 };
 
 export function TransactionDialog({
@@ -22,6 +23,7 @@ export function TransactionDialog({
   transaction,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
+  onSuccess,
 }: TransactionDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
@@ -45,7 +47,10 @@ export function TransactionDialog({
         </DialogHeader>
         <AddTransactionForm
           initialData={transaction}
-          onSuccess={() => onOpenChange?.(false)}
+          onSuccess={() => {
+            onSuccess?.();
+            onOpenChange?.(false);
+          }}
         />
       </DialogContent>
     </Dialog>

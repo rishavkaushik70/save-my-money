@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { normalizeCategory } from "@/lib/constants/transaction";
 
 const REPORT_RANGES = [
   { value: "THIS_MONTH", label: "This month" },
@@ -300,9 +301,11 @@ function ReportsPage({
   const allExpenseCategories = useMemo(() => {
     const totals = new Map<string, number>();
     for (const transaction of expenseTransactions) {
+      const canonicalCategory =
+        normalizeCategory(transaction.category, "EXPENSE") || "Other Expense";
       totals.set(
-        transaction.category,
-        (totals.get(transaction.category) ?? 0) + transaction.amount,
+        canonicalCategory,
+        (totals.get(canonicalCategory) ?? 0) + transaction.amount,
       );
     }
     return Array.from(totals, ([category, amount]) => ({ category, amount }))

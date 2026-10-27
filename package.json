@@ -7,7 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/subscriptions.test.mjs tests/transactions.test.mjs"
+    "test": "tsx --test tests/subscriptions.test.mjs tests/transactions.test.mjs tests/quick-add-parser.test.mjs tests/quick-add-flow.test.mjs tests/responsive-ui.test.mjs tests/category-system.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

@@ -185,7 +185,7 @@ const ExpensesByCategory = ({
   return (
     <section
       aria-labelledby="expense-breakdown-title"
-      className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-emerald-50/70 p-4 shadow-[0_16px_45px_-32px_rgba(15,23,42,0.35)] sm:p-5"
+      className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-emerald-50/70 p-3.5 shadow-[0_16px_45px_-32px_rgba(15,23,42,0.35)] sm:p-5"
     >
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
@@ -242,7 +242,7 @@ const ExpensesByCategory = ({
         <>
           <div className="mt-2 grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.8fr)]">
             <div className="grid min-w-0 grid-cols-1 items-center gap-3 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(13rem,0.9fr)]">
-              <div className="h-56 min-w-0 sm:h-64">
+              <div className="h-56 w-full min-w-0 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

@@ -10,6 +10,10 @@ import {
   transactionSchema,
 } from "@/lib/validators/transactions";
 import type { ExpenseBreakdown, ExpensePeriod } from "@/lib/types/dashboard";
+import {
+  normalizeCategory,
+  getCategoryFilterValues,
+} from "@/lib/constants/transaction";
 
 const INDIA_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 const EXPENSE_TRANSACTION_PAGE_SIZE = 50;
@@ -269,6 +273,10 @@ export async function getExpensesByCategory(
     date: { gte: previousRange.start, lt: previousRange.end },
   };
 
+  const filterCategories = category
+    ? getCategoryFilterValues(category, "EXPENSE")
+    : [];
+
   const [categoryTotals, matchingTransactions, currentSummary, previousSummary] = await Promise.all([
     prisma.transaction.groupBy({
       by: ["category"],
@@ -278,7 +286,10 @@ export async function getExpensesByCategory(
     }),
     category
       ? prisma.transaction.findMany({
-          where: { ...where, category },
+          where: {
+            ...where,
+            category: { in: filterCategories },
+          },
           select: {
             id: true,
             title: true,
@@ -304,11 +315,26 @@ export async function getExpensesByCategory(
 
   const totalExpense = currentSummary._sum.amount ?? 0;
 
+  // Merge legacy and canonical categories so duplicate report slices do not appear
+  const mergedCategoryMap = new Map<string, number>();
+  for (const { category: cat, _sum } of categoryTotals) {
+    const canonical = normalizeCategory(cat, "EXPENSE") || "Other Expense";
+    const amount = _sum.amount ?? 0;
+    mergedCategoryMap.set(
+      canonical,
+      (mergedCategoryMap.get(canonical) ?? 0) + amount,
+    );
+  }
+
+  const normalizedCategories = Array.from(mergedCategoryMap.entries())
+    .map(([categoryName, amount]) => ({
+      category: categoryName,
+      amount,
+    }))
+    .sort((a, b) => b.amount - a.amount);
+
   return {
-    categories: categoryTotals.map(({ category, _sum }) => ({
-      category,
-      amount: _sum.amount ?? 0,
-    })),
+    categories: normalizedCategories,
     transactions: matchingTransactions.slice(0, EXPENSE_TRANSACTION_PAGE_SIZE),
     hasMoreTransactions:
       matchingTransactions.length > EXPENSE_TRANSACTION_PAGE_SIZE,

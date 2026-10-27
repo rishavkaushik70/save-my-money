@@ -16,7 +16,7 @@ const SummaryCards = ({
   totalSavings,
 }: SummaryCardsProps) => {
   return (
-    <section aria-label="Financial summary" className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section aria-label="Financial summary" className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
       <SummaryCard
         title="Total Balance"
         amount={totalBalance}

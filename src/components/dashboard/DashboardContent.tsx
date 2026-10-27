@@ -8,6 +8,7 @@ import ExpensesByCategory from "./ExpensesByCategory/ExpensesByCategory";
 import TipSection from "./TipSection/TipSection";
 import { getGoalsPageData } from "@/actions/goalsPage";
 import SpendingAlert from "./SpendingAlert";
+import QuickAddCard from "./QuickAdd/QuickAddCard";
 
 type DashboardContentProps = {
   user: User;
@@ -31,8 +32,9 @@ export default async function DashboardContent({
   const progress = Math.round((completedSteps / 2) * 100);
 
   return (
-    <div className="min-w-0 w-full space-y-5 bg-slate-50 px-4 pb-8 pt-5 dark:bg-slate-950 sm:px-6 sm:pt-6 lg:px-8 2xl:px-10">
+    <div className="min-w-0 w-full space-y-4 sm:space-y-5 bg-slate-50 px-3.5 pb-8 pt-4 dark:bg-slate-950 sm:px-6 sm:pt-6 lg:px-8 2xl:px-10">
       <WelcomeCard user={user} progress={progress} />
+      <QuickAddCard />
       <SpendingAlert monthlyExpense={expenseBreakdown.totalExpense} />
 
       <SummaryCards

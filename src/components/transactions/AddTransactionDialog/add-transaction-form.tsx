@@ -29,21 +29,17 @@ import {
 } from "@/lib/validators/transactions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TRANSACTION_TYPES } from "@/lib/constants/transaction";
+import {
+  TRANSACTION_TYPES,
+  EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
+  isCategoryAllowedForType,
+  TransactionType,
+} from "@/lib/constants/transaction";
 import { Controller } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { createTransaction, updateTransaction } from "@/actions/transactions";
 import { toast } from "sonner";
-
-const items = [
-  { label: "Entertainment", value: "Entertainment" },
-  { label: "Shopping", value: "Shopping" },
-  { label: "Personal", value: "Personal" },
-  { label: "Groceries", value: "Groceries" },
-  { label: "Utilities", value: "Utilities" },
-  { label: "Transport", value: "Transport" },
-  { label: "Food", value: "Food" },
-];
 
 export function formatDateForInput(date?: unknown): string {
   if (!date) return new Date().toISOString().split("T")[0];
@@ -88,6 +84,39 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
       category: initialData?.category ?? "",
     },
   });
+
+  const currentType = form.watch("type") as TransactionType;
+  const currentCategory = form.watch("category");
+
+  const categoryOptions = useMemo(() => {
+    const canonicalValues = Array.from(
+      new Set(
+        currentType === "INCOME"
+          ? Object.values(INCOME_CATEGORIES)
+          : Object.values(EXPENSE_CATEGORIES),
+      ),
+    );
+
+    const options: Array<{ label: string; value: string }> =
+      canonicalValues.map((cat) => ({
+        label: cat,
+        value: cat,
+      }));
+
+    // If initialData has a historical/legacy category, preserve it as an option while editing
+    if (
+      initialData?.category &&
+      !(canonicalValues as string[]).includes(initialData.category) &&
+      currentCategory === initialData.category
+    ) {
+      options.unshift({
+        label: `${initialData.category} (Historical)`,
+        value: initialData.category,
+      });
+    }
+
+    return options;
+  }, [currentType, initialData?.category, currentCategory]);
 
   useEffect(() => {
     if (initialData) {
@@ -152,14 +181,26 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
             render={({ field }) => (
               <RadioGroup
                 value={field.value}
-                onValueChange={field.onChange}
-                className="flex"
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  const activeCategory = form.getValues("category");
+                  if (
+                    activeCategory &&
+                    !isCategoryAllowedForType(
+                      activeCategory,
+                      val as TransactionType,
+                    )
+                  ) {
+                    form.setValue("category", "");
+                  }
+                }}
+                className="grid grid-cols-2 gap-2.5"
               >
-                <FieldLabel>
+                <FieldLabel className="*:data-[slot=field]:p-2.5 sm:*:data-[slot=field]:p-3">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>
-                        <TrendingUp className="text-primary size-5" />
+                      <FieldTitle className="text-xs sm:text-sm font-semibold">
+                        <TrendingUp className="text-primary size-4 sm:size-5 shrink-0" />
                         Income
                       </FieldTitle>
                     </FieldContent>
@@ -168,11 +209,11 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
                   </Field>
                 </FieldLabel>
 
-                <FieldLabel>
+                <FieldLabel className="*:data-[slot=field]:p-2.5 sm:*:data-[slot=field]:p-3">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>
-                        <TrendingDown className="text-red-500 size-5" />
+                      <FieldTitle className="text-xs sm:text-sm font-semibold">
+                        <TrendingDown className="text-red-500 size-4 sm:size-5 shrink-0" />
                         Expense
                       </FieldTitle>
                     </FieldContent>
@@ -201,6 +242,7 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
             inputMode="decimal"
             placeholder="0.00"
             aria-describedby="amount-limit"
+            className="h-11 sm:h-10 rounded-xl"
             {...form.register("amount")}
           />
           <p id="amount-limit" className="text-xs text-muted-foreground">
@@ -213,25 +255,27 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
           )}
         </Field>
         <Field>
-          <Label>Category</Label>
+          <Label htmlFor="transaction-category">Category</Label>
 
           <Controller
             control={form.control}
             name="category"
             render={({ field }) => (
               <Select
-                items={items}
+                items={categoryOptions}
                 value={field.value}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger id="transaction-category" className="h-11 sm:h-10 w-full rounded-xl">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent align="start" side="bottom" sideOffset={4}>
                   <SelectGroup>
-                    <SelectLabel>Category</SelectLabel>
+                    <SelectLabel>
+                      {currentType === "INCOME" ? "Income Categories" : "Expense Categories"}
+                    </SelectLabel>
 
-                    {items.map((item) => (
+                    {categoryOptions.map((item) => (
                       <SelectItem key={item.value} value={item.value!}>
                         {item.label}
                       </SelectItem>
@@ -287,16 +331,16 @@ const AddTransactionForm = ({ initialData, onSuccess }: AddTransactionFormProps)
           )}
         </Field>
       </div>
-      <DialogFooter className="mt-5">
+      <DialogFooter className="mt-5 flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <DialogClose
           render={
-            <Button variant="outline" disabled={form.formState.isSubmitting}>
+            <Button variant="outline" className="w-full sm:w-auto" disabled={form.formState.isSubmitting}>
               Cancel
             </Button>
           }
         />
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting
             ? "Saving..."
             : isEdit

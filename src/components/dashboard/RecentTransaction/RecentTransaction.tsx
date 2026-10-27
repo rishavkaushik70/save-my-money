@@ -12,6 +12,24 @@ import {
   Apple,
   EllipsisVertical,
   Pencil,
+  Briefcase,
+  Laptop,
+  Building2,
+  TrendingUp,
+  Key,
+  RotateCcw,
+  Gift,
+  Wallet,
+  Home,
+  HeartPulse,
+  GraduationCap,
+  Plane,
+  CreditCard,
+  ShieldCheck,
+  Receipt,
+  ReceiptText,
+  CircleDollarSign,
+  type LucideIcon,
 } from "lucide-react";
 import { Transaction } from "@/generated/prisma/client";
 import Link from "next/link";
@@ -24,14 +42,43 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TransactionDialog } from "@/components/transactions/AddTransactionDialog/add-transaction-dialog";
 
-const categoryIcons = {
-  Shopping: ShoppingCart,
-  Food: Utensils,
-  Transport: Bus,
-  Entertainment: Film,
-  Utilities: Zap,
-  Personal: User,
+const categoryIcons: Record<string, LucideIcon> = {
+  // Canonical Expenses
+  "Food & Dining": Utensils,
   Groceries: Apple,
+  Transport: Bus,
+  "Housing & Rent": Home,
+  Utilities: Zap,
+  Shopping: ShoppingCart,
+  "Health & Medical": HeartPulse,
+  Education: GraduationCap,
+  Entertainment: Film,
+  "Personal Care": User,
+  Travel: Plane,
+  "EMI & Loan Payments": CreditCard,
+  Insurance: ShieldCheck,
+  "Family & Gifts": Gift,
+  "Savings & Investments": TrendingUp,
+  "Fees & Charges": Receipt,
+  Taxes: ReceiptText,
+  "Other Expense": CircleDollarSign,
+
+  // Canonical Income
+  Salary: Briefcase,
+  Freelance: Laptop,
+  "Business Income": Building2,
+  "Investment Returns": TrendingUp,
+  "Rental Income": Key,
+  Refunds: RotateCcw,
+  "Gifts Received": Gift,
+  "Other Income": Wallet,
+
+  // Historical & Legacy Aliases
+  Food: Utensils,
+  Personal: User,
+  Business: Building2,
+  Investment: TrendingUp,
+  Other: CircleDollarSign,
 };
 
 type RecentTransactionProps = {
@@ -43,7 +90,7 @@ const RecentTransaction = ({ transactions }: RecentTransactionProps) => {
     useState<Transaction | null>(null);
 
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-5">
+    <section className="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-700">
@@ -72,12 +119,12 @@ const RecentTransaction = ({ transactions }: RecentTransactionProps) => {
 
             return (
               <article
-                className="flex min-w-0 items-center justify-between gap-3 py-3.5"
+                className="flex min-w-0 items-center justify-between gap-2.5 sm:gap-3 py-3 sm:py-3.5"
                 key={data.id}
               >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-                    <Icon className="size-[18px]" aria-hidden="true" />
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                  <span className="flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <Icon className="size-4 sm:size-[18px]" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-900">
@@ -89,10 +136,10 @@ const RecentTransaction = ({ transactions }: RecentTransactionProps) => {
                   </div>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                   <div className="text-right">
                     <p
-                      className={`whitespace-nowrap text-sm font-bold tabular-nums ${
+                      className={`whitespace-nowrap text-xs sm:text-sm font-bold tabular-nums ${
                         data.type === "INCOME"
                           ? "text-emerald-700"
                           : "text-slate-900"
@@ -102,7 +149,7 @@ const RecentTransaction = ({ transactions }: RecentTransactionProps) => {
                       {data.amount.toLocaleString("en-IN")}
                     </p>
                     <time
-                      className="mt-1 block text-[11px] font-medium text-slate-500"
+                      className="mt-0.5 sm:mt-1 block text-[10px] sm:text-[11px] font-medium text-slate-500"
                       dateTime={transactionDate.toISOString()}
                     >
                       {transactionDate.toLocaleDateString("en-IN", {
@@ -118,10 +165,10 @@ const RecentTransaction = ({ transactions }: RecentTransactionProps) => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8 text-slate-500 hover:text-slate-900"
+                          className="size-9 rounded-xl text-slate-500 hover:text-slate-900"
+                          aria-label={`Options for ${data.title}`}
                         >
                           <EllipsisVertical className="size-4" />
-                          <span className="sr-only">Open menu</span>
                         </Button>
                       }
                     />

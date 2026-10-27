@@ -914,3 +914,24 @@ html.dark [data-dashboard-shell] [class*="text-emerald-700"],
 html.dark [data-dashboard-shell] [class*="text-primary"] {
   color: #6ee7b7 !important;
 }
+
+/* Quick Add Microphone continuous rotating gradient ring */
+@keyframes mic-ring-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mic-rotating-ring {
+  animation: mic-ring-spin 6s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic-rotating-ring {
+    animation: none !important;
+  }
+}

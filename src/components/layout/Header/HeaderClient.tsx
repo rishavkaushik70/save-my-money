@@ -98,12 +98,12 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex min-h-16 w-full items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 px-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:px-5 md:z-50 md:px-8 2xl:px-10">
+      <header className="sticky top-0 z-40 flex min-h-19 w-full items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 px-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:px-5 md:z-50 md:px-8 2xl:px-10">
         <div className="flex min-w-0 items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            className="-ml-1 shrink-0 rounded-xl text-slate-700 hover:bg-emerald-50 md:hidden"
+            className="-ml-1 size-10 shrink-0 rounded-xl text-slate-700 hover:bg-emerald-50 md:hidden"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation menu"
             aria-expanded={mobileMenuOpen}
@@ -152,9 +152,11 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
               <div
                 role="status"
                 aria-label="Notifications"
-                className="absolute right-0 top-11 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl"
+                className="absolute -right-2 sm:right-0 top-11 z-50 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl"
               >
-                <p className="text-sm font-bold text-slate-900">You’re all caught up</p>
+                <p className="text-sm font-bold text-slate-900">
+                  You’re all caught up
+                </p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
                   New reminders and account updates will appear here.
                 </p>
@@ -165,7 +167,9 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
           {user && (
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <Avatar className="size-9 shrink-0 ring-2 ring-emerald-100 sm:size-10">
-                {displayImage && <AvatarImage src={displayImage} alt={user.name} />}
+                {displayImage && (
+                  <AvatarImage src={displayImage} alt={user.name} />
+                )}
                 <AvatarFallback className="bg-emerald-50 font-bold text-emerald-800">
                   {user.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
@@ -196,7 +200,7 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
             role="dialog"
             aria-modal="true"
             aria-label="Dashboard navigation"
-              className="fixed inset-y-0 left-0 z-[61] flex w-72 max-w-[88vw] flex-col justify-between overflow-y-auto border-r border-white/60 bg-[#fbfdfc]/95 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-950/95"
+            className="fixed inset-y-0 left-0 z-[61] flex w-72 max-w-[85vw] flex-col justify-between overflow-y-auto border-r border-white/60 bg-[#fbfdfc]/95 shadow-2xl backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-950/95"
           >
             <div>
               <div className="flex h-16 items-center justify-between border-b border-slate-200/70 px-5">
@@ -214,7 +218,7 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-9 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                  className="size-10 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close navigation menu"
                 >
@@ -222,20 +226,24 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
                 </Button>
               </div>
 
-              <nav aria-label="Primary navigation" className="flex flex-col gap-1.5 p-4">
+              <nav
+                aria-label="Primary navigation"
+                className="flex flex-col gap-1.5 p-4"
+              >
                 {navItems.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(`${item.href}/`);
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       aria-current={isActive ? "page" : undefined}
-                      className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${
-                        isActive
+                      className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${isActive
                           ? "bg-emerald-700 text-white shadow-sm"
-                            : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-900 dark:text-slate-300 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-200"
-                      }`}
+                          : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-900 dark:text-slate-300 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-200"
+                        }`}
                     >
                       <item.icon className="size-4" />
                       <span>{item.label}</span>
@@ -243,15 +251,6 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
                   );
                 })}
               </nav>
-
-              <div className="px-4 pt-2">
-                <AddTransactionDialog>
-                  <Button className="w-full gap-2 rounded-xl shadow-sm">
-                    <Plus className="size-4" />
-                    Add transaction
-                  </Button>
-                </AddTransactionDialog>
-              </div>
             </div>
 
             <div className="mt-auto border-t border-slate-200 p-4">
@@ -268,7 +267,9 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
               {user && (
                 <div className="flex items-center gap-3 border-t border-slate-200 pt-3">
                   <Avatar className="size-9 ring-2 ring-emerald-100">
-                    {displayImage && <AvatarImage src={displayImage} alt={user.name} />}
+                    {displayImage && (
+                      <AvatarImage src={displayImage} alt={user.name} />
+                    )}
                     <AvatarFallback className="bg-emerald-50 font-bold text-emerald-800">
                       {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
@@ -279,10 +280,16 @@ const HeaderClient = ({ user, tier = "FREE" }: HeaderClientProps) => {
                         {user.name}
                       </p>
                       <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        {tier === "PREMIUM" ? "Premium" : tier === "PRO" ? "Pro" : "Free"}
+                        {tier === "PREMIUM"
+                          ? "Premium"
+                          : tier === "PRO"
+                            ? "Pro"
+                            : "Free"}
                       </span>
                     </div>
-                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
               )}

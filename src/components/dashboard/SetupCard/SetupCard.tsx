@@ -14,7 +14,7 @@ const SetupCard = ({ hasTransaction, hasGoals }: SetupCardProps) => {
   const completedCount = Number(hasTransaction) + Number(hasGoals);
 
   return (
-    <section className="flex h-full min-w-0 flex-col rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-sky-50/40 p-4 shadow-[0_14px_36px_-30px_rgba(15,23,42,0.4)] sm:p-5">
+    <section className="flex h-full min-w-0 flex-col rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-sky-50/40 p-3.5 shadow-[0_14px_36px_-30px_rgba(15,23,42,0.4)] sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-700">
@@ -48,12 +48,12 @@ const SetupCard = ({ hasTransaction, hasGoals }: SetupCardProps) => {
             </div>
           </div>
           {hasTransaction ? (
-            <span className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-emerald-50 px-3 text-xs font-bold text-emerald-800">
+            <span className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-emerald-50 px-3 text-xs font-bold text-emerald-800 w-full sm:w-auto">
               <Check className="size-3.5" aria-hidden="true" /> Added
             </span>
           ) : (
             <AddTransactionDialog>
-              <Button size="sm" className="h-9 shrink-0 gap-1.5 rounded-xl px-3">
+              <Button size="sm" className="h-9 shrink-0 gap-1.5 rounded-xl px-3 w-full sm:w-auto">
                 <Plus className="size-3.5" /> Add now
               </Button>
             </AddTransactionDialog>
@@ -77,7 +77,7 @@ const SetupCard = ({ hasTransaction, hasGoals }: SetupCardProps) => {
           {hasGoals ? (
             <Link
               href="/goals"
-              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-violet-50 px-3 text-xs font-bold text-violet-800 transition hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600"
+              className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-violet-50 px-3 text-xs font-bold text-violet-800 transition hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 w-full sm:w-auto"
             >
               <Check className="size-3.5" aria-hidden="true" /> View goals
               <ArrowUpRight className="size-3.5" aria-hidden="true" />
@@ -87,7 +87,7 @@ const SetupCard = ({ hasTransaction, hasGoals }: SetupCardProps) => {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-9 shrink-0 gap-1.5 rounded-xl border-violet-200 px-3 text-violet-800 hover:bg-violet-50"
+                className="h-9 shrink-0 gap-1.5 rounded-xl border-violet-200 px-3 text-violet-800 hover:bg-violet-50 w-full sm:w-auto"
               >
                 <Plus className="size-3.5" /> Create goal
               </Button>

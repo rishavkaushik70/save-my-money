@@ -39,6 +39,24 @@ import {
   User,
   Apple,
   Pencil,
+  Briefcase,
+  Laptop,
+  Building2,
+  TrendingUp,
+  Key,
+  RotateCcw,
+  Gift,
+  Wallet,
+  Home,
+  HeartPulse,
+  GraduationCap,
+  Plane,
+  CreditCard,
+  ShieldCheck,
+  Receipt,
+  ReceiptText,
+  CircleDollarSign,
+  type LucideIcon,
 } from "lucide-react";
 
 import { Transaction } from "@/generated/prisma/client";
@@ -50,47 +68,172 @@ import TransactionPagination from "../TransactionPagination/TransactionPaginatio
 import { deleteTransaction } from "@/actions/transactions";
 import { TransactionDialog } from "../AddTransactionDialog/add-transaction-dialog";
 
-const categoryConfig = {
-  Shopping: {
-    icon: ShoppingCart,
-    iconClass: "bg-green-100 text-green-600 dark:bg-green-950/60 dark:text-green-300",
-    badgeClass: "bg-green-50 text-green-700 dark:bg-green-950/60 dark:text-green-300",
-  },
+type CategoryStyle = {
+  icon: LucideIcon;
+  iconClass: string;
+  badgeClass: string;
+};
 
-  Food: {
+const categoryConfig: Record<string, CategoryStyle> = {
+  // Canonical Expenses
+  "Food & Dining": {
     icon: Utensils,
     iconClass: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300",
     badgeClass: "bg-yellow-50 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300",
   },
-
+  Groceries: {
+    icon: Apple,
+    iconClass: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+    badgeClass: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+  },
   Transport: {
     icon: Bus,
     iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
     badgeClass: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   },
-
+  "Housing & Rent": {
+    icon: Home,
+    iconClass: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+    badgeClass: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+  },
+  Utilities: {
+    icon: Zap,
+    iconClass: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+    badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  },
+  Shopping: {
+    icon: ShoppingCart,
+    iconClass: "bg-green-100 text-green-600 dark:bg-green-950/60 dark:text-green-300",
+    badgeClass: "bg-green-50 text-green-700 dark:bg-green-950/60 dark:text-green-300",
+  },
+  "Health & Medical": {
+    icon: HeartPulse,
+    iconClass: "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
+    badgeClass: "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
+  },
+  Education: {
+    icon: GraduationCap,
+    iconClass: "bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
+    badgeClass: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
+  },
   Entertainment: {
     icon: Film,
     iconClass: "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
     badgeClass: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
   },
+  "Personal Care": {
+    icon: User,
+    iconClass: "bg-teal-100 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
+    badgeClass: "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
+  },
+  Travel: {
+    icon: Plane,
+    iconClass: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
+    badgeClass: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
+  },
+  "EMI & Loan Payments": {
+    icon: CreditCard,
+    iconClass: "bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
+    badgeClass: "bg-orange-50 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
+  },
+  Insurance: {
+    icon: ShieldCheck,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+  "Family & Gifts": {
+    icon: Gift,
+    iconClass: "bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+    badgeClass: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+  },
+  "Savings & Investments": {
+    icon: TrendingUp,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+  "Fees & Charges": {
+    icon: Receipt,
+    iconClass: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+    badgeClass: "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  },
+  Taxes: {
+    icon: ReceiptText,
+    iconClass: "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300",
+    badgeClass: "bg-stone-50 text-stone-700 dark:bg-stone-800 dark:text-stone-300",
+  },
+  "Other Expense": {
+    icon: CircleDollarSign,
+    iconClass: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+    badgeClass: "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  },
 
-  Utilities: {
-    icon: Zap,
+  // Canonical Income
+  Salary: {
+    icon: Briefcase,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+  Freelance: {
+    icon: Laptop,
+    iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
+    badgeClass: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
+  },
+  "Business Income": {
+    icon: Building2,
+    iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+    badgeClass: "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+  },
+  "Investment Returns": {
+    icon: TrendingUp,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+  "Rental Income": {
+    icon: Key,
+    iconClass: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+    badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  },
+  Refunds: {
+    icon: RotateCcw,
+    iconClass: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
+    badgeClass: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
+  },
+  "Gifts Received": {
+    icon: Gift,
+    iconClass: "bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+    badgeClass: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+  },
+  "Other Income": {
+    icon: Wallet,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+
+  // Historical & Legacy Aliases
+  Food: {
+    icon: Utensils,
     iconClass: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300",
     badgeClass: "bg-yellow-50 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300",
   },
-
   Personal: {
     icon: User,
-    iconClass: "bg-green-100 text-green-600 dark:bg-green-950/60 dark:text-green-300",
-    badgeClass: "bg-green-50 text-green-700 dark:bg-green-950/60 dark:text-green-300",
+    iconClass: "bg-teal-100 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
+    badgeClass: "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
   },
-
-  Groceries: {
-    icon: Apple,
-    iconClass: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300",
-    badgeClass: "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+  Business: {
+    icon: Building2,
+    iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+    badgeClass: "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+  },
+  Investment: {
+    icon: TrendingUp,
+    iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  },
+  Other: {
+    icon: CircleDollarSign,
+    iconClass: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+    badgeClass: "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
   },
 };
 

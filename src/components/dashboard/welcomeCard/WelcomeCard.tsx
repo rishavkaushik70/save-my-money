@@ -7,7 +7,7 @@ type WelcomeCardProps = {
 };
 const WelcomeCard = ({ user, progress }: WelcomeCardProps) => {
   return (
-    <section className="relative isolate min-w-0 overflow-hidden rounded-[28px] border border-emerald-100 bg-gradient-to-br from-white via-white to-emerald-50 p-5 shadow-sm sm:p-7 lg:p-8">
+    <section className="relative isolate min-w-0 overflow-hidden rounded-[28px] border border-emerald-100 bg-gradient-to-br from-white via-white to-emerald-50 p-4 shadow-sm sm:p-7 lg:p-8">
       <div className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full bg-emerald-100/50 blur-3xl" />
       <div className="relative flex min-w-0 items-start justify-between gap-4 sm:gap-6">
         <div className="min-w-0 flex-1">
@@ -15,10 +15,10 @@ const WelcomeCard = ({ user, progress }: WelcomeCardProps) => {
             <Sparkles className="size-3.5" />
             Your money overview
           </span>
-          <h1 className="mt-4 break-words text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl lg:text-4xl">
+          <h1 className="mt-3 sm:mt-4 break-words text-xl font-bold tracking-tight text-slate-950 sm:text-3xl lg:text-4xl">
             Welcome back, {user.name ?? "there"}! <span aria-hidden="true">👋</span>
           </h1>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
+          <p className="mt-1.5 sm:mt-2 max-w-xl text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
             A clearer view of your spending, goals, and the progress you&apos;re making.
           </p>
         </div>
@@ -35,7 +35,7 @@ const WelcomeCard = ({ user, progress }: WelcomeCardProps) => {
         </div>
       </div>
 
-      <div className="relative mt-6 max-w-3xl rounded-2xl border border-emerald-100/80 bg-white/75 p-4 sm:mt-7 sm:p-5">
+      <div className="relative mt-5 sm:mt-7 max-w-3xl rounded-2xl border border-emerald-100/80 bg-white/75 p-3.5 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <span className="text-sm font-semibold text-slate-800">Setup progress</span>
           <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">

@@ -13,10 +13,10 @@ export default async function DashboardLayout({
 
   return (
     <SettingsProvider userId={session?.user.id ?? "local-user"}>
-      <div data-dashboard-shell className="flex min-h-dvh w-full bg-slate-50 dark:bg-slate-950">
+      <div data-dashboard-shell className="flex min-h-dvh w-full overflow-x-clip bg-slate-50 dark:bg-slate-950">
         <Sidebar />
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-x-clip">
           <Header />
           <main className="min-w-0">{children}</main>
         </div>

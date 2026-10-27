@@ -30,7 +30,7 @@ const TipSection = ({
   return (
     <aside
       role="status"
-      className="flex min-w-0 items-start gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50 px-4 py-4 shadow-sm sm:items-center sm:px-5 dark:border-emerald-900/80 dark:bg-[#102a20]"
+      className="flex min-w-0 items-start gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50 px-3.5 py-3.5 shadow-sm sm:items-center sm:px-5 dark:border-emerald-900/80 dark:bg-[#102a20]"
     >
       <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100 dark:bg-[#0b1c14] dark:text-emerald-300 dark:ring-[#244735]">
         <Lightbulb className="size-5" aria-hidden="true" />
