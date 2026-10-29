@@ -163,6 +163,99 @@ export async function createTransaction(transaction: TransactionOutput) {
   }
 }
 
+// Atomically create multiple transactions
+export async function createManyTransactions(transactions: TransactionOutput[]) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return {
+        success: false,
+        message: "Unauthorized. Please sign in.",
+        count: 0,
+      };
+    }
+
+    if (!Array.isArray(transactions) || transactions.length === 0) {
+      return {
+        success: false,
+        message: "No transactions provided to save.",
+        count: 0,
+      };
+    }
+
+    if (transactions.length > 50) {
+      return {
+        success: false,
+        message: "Cannot save more than 50 transactions at once.",
+        count: 0,
+      };
+    }
+
+    const validTransactions: TransactionOutput[] = [];
+    const now = Date.now();
+
+    for (let i = 0; i < transactions.length; i++) {
+      const raw = transactions[i];
+      const validation = transactionSchema.safeParse(raw);
+      if (!validation.success) {
+        return {
+          success: false,
+          message: `Transaction #${i + 1} is invalid: ${
+            validation.error.issues[0]?.message ?? "Invalid details."
+          }`,
+          count: 0,
+        };
+      }
+
+      const validTx = validation.data;
+      if (validTx.date.getTime() > now + 60_000) {
+        return {
+          success: false,
+          message: `Transaction #${i + 1} date cannot be in the future.`,
+          count: 0,
+        };
+      }
+
+      validTransactions.push(validTx);
+    }
+
+    // Atomic persistence using prisma.$transaction
+    await prisma.$transaction(
+      validTransactions.map((tx) =>
+        prisma.transaction.create({
+          data: {
+            ...tx,
+            userId: session.user.id,
+          },
+        })
+      )
+    );
+
+    revalidatePath("/dashboard");
+    revalidatePath("/transaction");
+    revalidatePath("/reports");
+
+    return {
+      success: true,
+      message: `Successfully added ${validTransactions.length} transaction${
+        validTransactions.length > 1 ? "s" : ""
+      }.`,
+      count: validTransactions.length,
+    };
+  } catch (error) {
+    console.error("Create Many Transactions Error:", error);
+
+    return {
+      success: false,
+      message: "Something went wrong while saving transactions. Please try again.",
+      count: 0,
+    };
+  }
+}
+
 //To get 5 recent transaction
 
 export async function getRecentTransactions() {
