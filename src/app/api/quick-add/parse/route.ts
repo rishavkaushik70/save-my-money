@@ -67,11 +67,15 @@ export async function POST(req: NextRequest) {
         ? clientDate.trim()
         : undefined;
 
-    // 3. Execute Gemini AI Parsing with Structured Output & Fallback
+    const requestId = `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
+    // 3. Execute Gemini AI Parsing with Structured Output, Signal Forwarding & Safe Diagnostics
     const result = await parseTransactionWithGemini({
       text: trimmedText,
       clientDate: sanitizedClientDate,
       timezone: sanitizedTimezone,
+      signal: req.signal,
+      requestId,
     });
 
     // 4. Return Structured Drafts without any Database Writes
@@ -82,10 +86,25 @@ export async function POST(req: NextRequest) {
       overallReasoning: result.overallReasoning,
       source: result.source,
       message: result.message,
+      requestId: result.requestId || requestId,
     });
   } catch (err: unknown) {
+    const isAbort =
+      req.signal.aborted ||
+      (err instanceof Error && (err.name === "AbortError" || err.message.includes("aborted")));
+
+    if (isAbort) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Request was cancelled.",
+        },
+        { status: 499 }
+      );
+    }
+
     const message = err instanceof Error ? err.message : "Internal server error";
-    console.error("[API] /api/quick-add/parse error:", message);
+    console.error("[API] /api/quick-add/parse error:", message.slice(0, 150));
 
     return NextResponse.json(
       {

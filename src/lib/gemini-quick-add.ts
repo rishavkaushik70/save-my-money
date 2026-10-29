@@ -54,6 +54,18 @@ export interface ParsedTransactionDraft {
   reasoning?: string;
 }
 
+export interface GeminiDiagnostics {
+  requestId: string;
+  model: string;
+  durationMs: number;
+  httpStatus?: number;
+  providerCode?: string;
+  sanitizedMessage?: string;
+  timedOut: boolean;
+  cancelled: boolean;
+  success: boolean;
+}
+
 export interface ParsedTransactionResult {
   success: boolean;
   transactions: ParsedTransactionDraft[];
@@ -61,6 +73,98 @@ export interface ParsedTransactionResult {
   source: "gemini" | "fallback";
   message?: string;
   overallReasoning?: string;
+  requestId?: string;
+  diagnostics?: GeminiDiagnostics;
+}
+
+export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
+export const DEFAULT_GEMINI_TIMEOUT_MS = 25000;
+
+/**
+ * Resolves and sanitizes the Gemini model identifier.
+ * Automatically falls back to DEFAULT_GEMINI_MODEL if empty or if legacy/deprecated models are provided.
+ */
+export function resolveGeminiModel(configuredModel?: string): string {
+  const trimmed = (configuredModel || "").replace(/['"]/g, "").trim();
+  if (!trimmed) {
+    return DEFAULT_GEMINI_MODEL;
+  }
+  // If user configured the deprecated 2.5 flash which returns 404 for new users
+  if (trimmed === "gemini-2.5-flash" || trimmed === "models/gemini-2.5-flash") {
+    console.warn(
+      `[Gemini Quick Add] Configured model '${trimmed}' is deprecated and returns 404 for newer projects. Automatically resolving to '${DEFAULT_GEMINI_MODEL}'.`
+    );
+    return DEFAULT_GEMINI_MODEL;
+  }
+  return trimmed;
+}
+
+export interface ExtractedApiErrorInfo {
+  httpStatus: number;
+  providerCode: string;
+  sanitizedMessage: string;
+}
+
+/**
+ * Extracts sanitized error details from SDK/network errors without exposing secrets, auth tokens or PII.
+ */
+export function extractProviderErrorInfo(err: unknown): ExtractedApiErrorInfo | null {
+  if (!err || typeof err !== "object") return null;
+
+  let httpStatus = (err as { status?: number }).status;
+  const rawMessage = (err as { message?: string }).message || "";
+
+  let providerCode = "UNKNOWN_ERROR";
+  let sanitizedMessage = rawMessage;
+
+  // Try parsing JSON error body if present (Google APIs often embed JSON in message)
+  try {
+    const parsed = JSON.parse(rawMessage);
+    if (parsed && typeof parsed === "object" && parsed.error) {
+      const errObj = parsed.error;
+      if (typeof errObj.code === "number" && !httpStatus) {
+        httpStatus = errObj.code;
+      }
+      if (typeof errObj.status === "string" && errObj.status) {
+        providerCode = errObj.status;
+      }
+      if (typeof errObj.message === "string" && errObj.message) {
+        sanitizedMessage = errObj.message;
+      }
+    }
+  } catch {
+    // rawMessage is plain text
+  }
+
+  if (!httpStatus) {
+    if (providerCode === "NOT_FOUND" || rawMessage.includes("404")) httpStatus = 404;
+    else if (providerCode === "INVALID_ARGUMENT" || rawMessage.includes("400")) httpStatus = 400;
+    else if (providerCode === "RESOURCE_EXHAUSTED" || rawMessage.includes("429")) httpStatus = 429;
+    else if (providerCode === "UNAVAILABLE" || rawMessage.includes("503")) httpStatus = 503;
+    else httpStatus = 500;
+  }
+
+  // Sanitize: strip out any API key, auth token, URL query strings, or potential secrets/PII
+  sanitizedMessage = sanitizedMessage
+    .replace(/key=[A-Za-z0-9_-]+/gi, "key=[REDACTED]")
+    .replace(/AIza[A-Za-z0-9_-]{35}/g, "[REDACTED_API_KEY]")
+    .replace(/AQ\.[A-Za-z0-9_-]{40,}/g, "[REDACTED_API_KEY]")
+    .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer [REDACTED]")
+    .replace(/https?:\/\/[^\s]+/gi, (url) => {
+      try {
+        const u = new URL(url);
+        return `${u.origin}${u.pathname}`;
+      } catch {
+        return url;
+      }
+    })
+    .slice(0, 300);
+
+  return {
+    httpStatus,
+    providerCode,
+    sanitizedMessage,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -442,14 +546,33 @@ export interface ParseTransactionOptions {
   clientDate?: string;
   timezone?: string;
   timeoutMs?: number;
+  signal?: AbortSignal;
+  requestId?: string;
+  model?: string;
 }
 
 export async function parseTransactionWithGemini({
   text,
   clientDate,
   timezone = "Asia/Kolkata",
-  timeoutMs = 8000,
+  timeoutMs,
+  signal,
+  requestId,
+  model: customModel,
 }: ParseTransactionOptions): Promise<ParsedTransactionResult> {
+  const startTime = Date.now();
+  const effectiveRequestId =
+    requestId || `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const cleanModel = resolveGeminiModel(customModel || process.env.GEMINI_MODEL);
+
+  const envTimeout = parseInt(process.env.GEMINI_TIMEOUT_MS || "", 10);
+  const effectiveTimeout =
+    timeoutMs !== undefined
+      ? timeoutMs
+      : !isNaN(envTimeout) && envTimeout > 0
+      ? envTimeout
+      : DEFAULT_GEMINI_TIMEOUT_MS;
+
   const rawInput = text.trim();
   if (!rawInput) {
     const emptyDraft: ParsedTransactionDraft = {
@@ -467,24 +590,81 @@ export async function parseTransactionWithGemini({
       draft: emptyDraft,
       source: "fallback",
       message: "Input text cannot be empty.",
+      requestId: effectiveRequestId,
+    };
+  }
+
+  if (signal?.aborted) {
+    const diagnostics: GeminiDiagnostics = {
+      requestId: effectiveRequestId,
+      model: cleanModel,
+      durationMs: Date.now() - startTime,
+      httpStatus: 499,
+      providerCode: "CLIENT_CLOSED_REQUEST",
+      sanitizedMessage: "Request was cancelled or aborted by client.",
+      timedOut: false,
+      cancelled: true,
+      success: false,
+    };
+    return {
+      ...createGeminiFallbackDraft(
+        rawInput,
+        "Parsing was cancelled. Used local deterministic parser instead."
+      ),
+      requestId: effectiveRequestId,
+      diagnostics,
     };
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.trim() === "" || apiKey === "AIzaSyYourGeminiApiKeyHere") {
-    return createGeminiFallbackDraft(
-      rawInput,
-      "Google Gemini API key not configured. Used local deterministic parser instead."
-    );
+    const diagnostics: GeminiDiagnostics = {
+      requestId: effectiveRequestId,
+      model: cleanModel,
+      durationMs: Date.now() - startTime,
+      httpStatus: 401,
+      providerCode: "API_KEY_NOT_CONFIGURED",
+      sanitizedMessage: "Google Gemini API key not configured.",
+      timedOut: false,
+      cancelled: false,
+      success: false,
+    };
+    return {
+      ...createGeminiFallbackDraft(
+        rawInput,
+        "Google Gemini API key not configured. Used local deterministic parser instead."
+      ),
+      requestId: effectiveRequestId,
+      diagnostics,
+    };
   }
 
   const referenceNow = clientDate ? new Date(clientDate) : new Date();
   const validReferenceNow = isNaN(referenceNow.getTime()) ? new Date() : referenceNow;
   const formattedRefDate = validReferenceNow.toISOString().split("T")[0];
 
+  const controller = new AbortController();
+  let timedOut = false;
+
+  const timeoutHandle = setTimeout(() => {
+    timedOut = true;
+    controller.abort(new Error(`Gemini API request timed out after ${effectiveTimeout}ms`));
+  }, effectiveTimeout);
+
+  const onParentAbort = () => {
+    controller.abort(new Error("Client cancelled request"));
+  };
+
+  if (signal) {
+    if (signal.aborted) {
+      onParentAbort();
+    } else {
+      signal.addEventListener("abort", onParentAbort, { once: true });
+    }
+  }
+
   try {
     const ai = new GoogleGenAI({ apiKey });
-    const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 
     const systemPrompt = buildGeminiSystemPrompt(
       `${formattedRefDate} (${validReferenceNow.toLocaleDateString("en-US", { weekday: "long" })})`,
@@ -492,8 +672,8 @@ export async function parseTransactionWithGemini({
     );
 
     // Call Gemini API with Structured Output Schema for multiple transactions
-    const generatePromise = ai.models.generateContent({
-      model,
+    const response = await ai.models.generateContent({
+      model: cleanModel,
       contents: rawInput,
       config: {
         systemInstruction: systemPrompt,
@@ -529,7 +709,6 @@ export async function parseTransactionWithGemini({
                   },
                   category: {
                     type: Type.STRING,
-                    enum: ALL_CANONICAL_CATEGORIES,
                     nullable: true,
                     description:
                       "The exact category matching the canonical taxonomy. null if ambiguous, multi-category, or not determinable.",
@@ -569,22 +748,47 @@ export async function parseTransactionWithGemini({
           required: ["transactions"],
         },
         temperature: 0.1,
+        abortSignal: controller.signal,
+        httpOptions: {
+          timeout: effectiveTimeout,
+          retryOptions: {
+            attempts: 2,
+            initialDelay: 0.5,
+            maxDelay: 2.0,
+            expBase: 2,
+            jitter: 1,
+            httpStatusCodes: [429, 503, 504],
+          },
+        },
       },
     });
 
-    // Enforce network timeout
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("Gemini API request timed out")), timeoutMs);
-    });
-
-    const response = await Promise.race([generatePromise, timeoutPromise]);
+    const durationMs = Date.now() - startTime;
     const rawText = response.text;
 
     if (!rawText) {
-      return createGeminiFallbackDraft(
-        rawInput,
-        "Gemini returned an empty response. Used local deterministic parser instead."
+      const diagnostics: GeminiDiagnostics = {
+        requestId: effectiveRequestId,
+        model: cleanModel,
+        durationMs,
+        httpStatus: 200,
+        providerCode: "EMPTY_RESPONSE",
+        sanitizedMessage: "Gemini returned an empty response body.",
+        timedOut: false,
+        cancelled: false,
+        success: false,
+      };
+      console.warn(
+        `[Gemini Quick Add Diagnostics] requestId=${effectiveRequestId} model=${cleanModel} duration=${durationMs}ms status=200 code=EMPTY_RESPONSE cancelled=false timedOut=false message="Empty response"`
       );
+      return {
+        ...createGeminiFallbackDraft(
+          rawInput,
+          "Gemini returned an empty response. Used local deterministic parser instead."
+        ),
+        requestId: effectiveRequestId,
+        diagnostics,
+      };
     }
 
     const parsedJson = JSON.parse(rawText);
@@ -605,15 +809,46 @@ export async function parseTransactionWithGemini({
     }
 
     if (rawTransactions.length === 0) {
-      return createGeminiFallbackDraft(
-        rawInput,
-        "No transactions could be extracted from input. Used local deterministic parser instead."
-      );
+      const diagnostics: GeminiDiagnostics = {
+        requestId: effectiveRequestId,
+        model: cleanModel,
+        durationMs,
+        httpStatus: 200,
+        providerCode: "NO_TRANSACTIONS",
+        sanitizedMessage: "No transactions extracted from input.",
+        timedOut: false,
+        cancelled: false,
+        success: false,
+      };
+      return {
+        ...createGeminiFallbackDraft(
+          rawInput,
+          "No transactions could be extracted from input. Used local deterministic parser instead."
+        ),
+        requestId: effectiveRequestId,
+        diagnostics,
+      };
     }
 
     // Apply strict server-side business rules and validation to every transaction
     const sanitizedDrafts = rawTransactions.map((rawDraft) =>
       validateAndSanitizeGeminiDraft(rawDraft, rawInput, validReferenceNow)
+    );
+
+    const diagnostics: GeminiDiagnostics = {
+      requestId: effectiveRequestId,
+      model: cleanModel,
+      durationMs,
+      httpStatus: 200,
+      providerCode: "OK",
+      sanitizedMessage: "Success",
+      timedOut: false,
+      cancelled: false,
+      success: true,
+    };
+
+    console.info(
+      `[Gemini Quick Add Diagnostics] requestId=${effectiveRequestId} model=${cleanModel} duration=${durationMs}ms status=200 code=OK transactions=${sanitizedDrafts.length}`
     );
 
     return {
@@ -622,19 +857,79 @@ export async function parseTransactionWithGemini({
       draft: sanitizedDrafts[0],
       source: "gemini",
       overallReasoning,
+      requestId: effectiveRequestId,
+      diagnostics,
     };
   } catch (err: unknown) {
-    const isTimeout = err instanceof Error && err.message.includes("timed out");
-    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    const durationMs = Date.now() - startTime;
+    const isTimeout =
+      timedOut ||
+      (err instanceof Error &&
+        (err.message.toLowerCase().includes("timed out") ||
+          err.message.toLowerCase().includes("timeout")));
+
+    const isCancelled =
+      !isTimeout &&
+      (Boolean(signal?.aborted) ||
+        (err instanceof Error &&
+          (err.name === "AbortError" ||
+            err.message.toLowerCase().includes("aborted") ||
+            err.message.toLowerCase().includes("cancelled"))));
+
+    let httpStatus = 500;
+    let providerCode = "INTERNAL_ERROR";
+    let sanitizedMessage = err instanceof Error ? err.message : "Unknown error";
+
+    if (isTimeout) {
+      httpStatus = 504;
+      providerCode = "REQUEST_TIMEOUT";
+      sanitizedMessage = `Gemini request timed out after ${effectiveTimeout}ms.`;
+    } else if (isCancelled) {
+      httpStatus = 499;
+      providerCode = "CLIENT_CLOSED_REQUEST";
+      sanitizedMessage = "Request was cancelled or aborted by client.";
+    } else {
+      const extracted = extractProviderErrorInfo(err);
+      if (extracted) {
+        httpStatus = extracted.httpStatus;
+        providerCode = extracted.providerCode;
+        sanitizedMessage = extracted.sanitizedMessage;
+      }
+    }
+
+    const diagnostics: GeminiDiagnostics = {
+      requestId: effectiveRequestId,
+      model: cleanModel,
+      durationMs,
+      httpStatus,
+      providerCode,
+      sanitizedMessage,
+      timedOut: isTimeout,
+      cancelled: isCancelled,
+      success: false,
+    };
+
+    // Safe structured logging: NEVER logs API keys, auth headers, or full transaction text
     console.warn(
-      `[Gemini Quick Add] Request failed (${isTimeout ? "Timeout" : "Error"}): ${errorMessage}. Falling back to deterministic parser.`
+      `[Gemini Quick Add Diagnostics] requestId=${effectiveRequestId} model=${cleanModel} duration=${durationMs}ms status=${httpStatus} code=${providerCode} cancelled=${isCancelled} timedOut=${isTimeout} message="${sanitizedMessage}"`
     );
 
-    return createGeminiFallbackDraft(
-      rawInput,
-      isTimeout
-        ? "Gemini API timed out. Used local deterministic parser instead."
-        : "Gemini API unavailable. Used local deterministic parser instead."
-    );
+    return {
+      ...createGeminiFallbackDraft(
+        rawInput,
+        isTimeout
+          ? "Gemini API timed out. Used local deterministic parser instead."
+          : isCancelled
+          ? "Parsing was cancelled. Used local deterministic parser instead."
+          : "Parsed with local parser — Gemini was unavailable; details extracted locally for your review."
+      ),
+      requestId: effectiveRequestId,
+      diagnostics,
+    };
+  } finally {
+    clearTimeout(timeoutHandle);
+    if (signal) {
+      signal.removeEventListener("abort", onParentAbort);
+    }
   }
 }

@@ -51,6 +51,15 @@ export function QuickAddCard() {
     SPEECH_LANGUAGES[0];
 
   const [isParsing, setIsParsing] = useState(false);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleParse = async (overrideText?: string) => {
     const rawText = (overrideText ?? input).trim();
@@ -59,7 +68,13 @@ export function QuickAddCard() {
       return;
     }
 
-    if (isParsing) return;
+    // Cancel any previous in-flight parse request cleanly
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsParsing(true);
 
     try {
@@ -73,6 +88,7 @@ export function QuickAddCard() {
           clientDate: new Date().toISOString(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json();
@@ -153,7 +169,12 @@ export function QuickAddCard() {
           description: "Review extracted details below before saving.",
         });
       }
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        // Clean cancellation; ignore
+        return;
+      }
+
       // Network failure fallback
       const fallbackResult = createGeminiFallbackDraft(rawText);
       const fallbackDrafts: QuickAddReviewDraft[] = fallbackResult.transactions.map(
@@ -177,7 +198,10 @@ export function QuickAddCard() {
         description: "Could not reach AI service; used local parser instead.",
       });
     } finally {
-      setIsParsing(false);
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setIsParsing(false);
+      }
     }
   };
 

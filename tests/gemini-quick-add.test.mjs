@@ -13,6 +13,9 @@ import {
   containsHallucinatedTerms,
   buildFactualFallbackDescription,
   formatCurrencyINR,
+  DEFAULT_GEMINI_MODEL,
+  resolveGeminiModel,
+  extractProviderErrorInfo,
 } from "../src/lib/gemini-quick-add.ts";
 import {
   EXPENSE_CATEGORIES,
@@ -923,6 +926,194 @@ test("QuickAddReview displays description input and preserves raw input indicato
   assert.ok(
     reviewSource.includes("Original:"),
     "QuickAddReview must display original input indicator when different from description"
+  );
+});
+
+// -------------------------------------------------------------
+// Suite 8: Diagnostics, Error Sanitization, Timeout, 499 & Independence
+// -------------------------------------------------------------
+
+test("resolveGeminiModel handles defaults, whitespace, quotes, and deprecated 2.5 flash", () => {
+  assert.equal(resolveGeminiModel(), DEFAULT_GEMINI_MODEL);
+  assert.equal(resolveGeminiModel(""), DEFAULT_GEMINI_MODEL);
+  assert.equal(resolveGeminiModel("   "), DEFAULT_GEMINI_MODEL);
+  assert.equal(resolveGeminiModel('"gemini-3.5-flash-lite"'), "gemini-3.5-flash-lite");
+  assert.equal(resolveGeminiModel("'gemini-3.5-flash-lite'"), "gemini-3.5-flash-lite");
+
+  // Deprecated model causes 404 for new projects, so it must resolve safely to default
+  assert.equal(resolveGeminiModel("gemini-2.5-flash"), DEFAULT_GEMINI_MODEL);
+  assert.equal(resolveGeminiModel("models/gemini-2.5-flash"), DEFAULT_GEMINI_MODEL);
+
+  // Other valid model identifiers are preserved
+  assert.equal(resolveGeminiModel("gemini-3.8-flash"), "gemini-3.8-flash");
+});
+
+test("extractProviderErrorInfo extracts status, code and sanitizes JSON error payloads", () => {
+  // 400 Bad Request / INVALID_ARGUMENT
+  const error400 = {
+    status: 400,
+    message: JSON.stringify({
+      error: {
+        code: 400,
+        message: "Invalid JSON schema for field category. key=MOCK_SECRET_TEST_KEY_12345",
+        status: "INVALID_ARGUMENT",
+      },
+    }),
+  };
+
+  const parsed400 = extractProviderErrorInfo(error400);
+  assert.equal(parsed400.httpStatus, 400);
+  assert.equal(parsed400.providerCode, "INVALID_ARGUMENT");
+  assert.ok(!parsed400.sanitizedMessage.includes("MOCK_SECRET_TEST_KEY_12345"), "Must redact API key");
+  assert.ok(parsed400.sanitizedMessage.includes("[REDACTED]"), "Must replace API key parameter");
+
+  // 404 Not Found
+  const error404 = {
+    status: 404,
+    message: JSON.stringify({
+      error: {
+        code: 404,
+        message: "models/gemini-2.5-flash is not found",
+        status: "NOT_FOUND",
+      },
+    }),
+  };
+
+  const parsed404 = extractProviderErrorInfo(error404);
+  assert.equal(parsed404.httpStatus, 404);
+  assert.equal(parsed404.providerCode, "NOT_FOUND");
+
+  // 429 Resource Exhausted / Rate limit
+  const error429 = {
+    status: 429,
+    message: JSON.stringify({
+      error: {
+        code: 429,
+        message: "Resource has been exhausted (e.g. check quota)",
+        status: "RESOURCE_EXHAUSTED",
+      },
+    }),
+  };
+
+  const parsed429 = extractProviderErrorInfo(error429);
+  assert.equal(parsed429.httpStatus, 429);
+  assert.equal(parsed429.providerCode, "RESOURCE_EXHAUSTED");
+
+  // 503 Unavailable
+  const error503 = {
+    status: 503,
+    message: JSON.stringify({
+      error: {
+        code: 503,
+        message: "The service is temporarily unavailable",
+        status: "UNAVAILABLE",
+      },
+    }),
+  };
+
+  const parsed503 = extractProviderErrorInfo(error503);
+  assert.equal(parsed503.httpStatus, 503);
+  assert.equal(parsed503.providerCode, "UNAVAILABLE");
+});
+
+test("extractProviderErrorInfo strips Bearer tokens, long URLs, and query parameters", () => {
+  const sensitiveError = new Error(
+    "Failed to fetch https://generativelanguage.googleapis.com/v1beta/models?key=MOCK_KEY_TEST_STRING with Bearer MOCK_BEARER_TOKEN_VALUE raw details"
+  );
+
+  const parsed = extractProviderErrorInfo(sensitiveError);
+  assert.ok(!parsed.sanitizedMessage.includes("MOCK_KEY_TEST_STRING"), "Must redact key");
+  assert.ok(!parsed.sanitizedMessage.includes("MOCK_BEARER_TOKEN_VALUE"), "Must redact Bearer token");
+  assert.ok(!parsed.sanitizedMessage.includes("key="), "Must redact key parameter in URL");
+});
+
+test("Cancellation via AbortSignal produces 499 status and fallback draft cleanly", async () => {
+  const controller = new AbortController();
+  controller.abort(); // Pre-abort signal
+
+  const result = await parseTransactionWithGemini({
+    text: "Spent 400 on lunch",
+    signal: controller.signal,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.source, "fallback");
+  assert.equal(result.draft.amount, 400);
+  assert.equal(result.draft.needsReview, true);
+  assert.ok(result.diagnostics, "Diagnostics must be attached");
+  assert.equal(result.diagnostics.cancelled, true, "cancelled flag must be true");
+  assert.equal(result.diagnostics.httpStatus, 499, "HTTP status must be 499 for client abort");
+  assert.equal(result.diagnostics.providerCode, "CLIENT_CLOSED_REQUEST");
+});
+
+test("Timeout produces 504 status and fallback draft without dangling sockets", async () => {
+  const originalKey = process.env.GEMINI_API_KEY;
+  process.env.GEMINI_API_KEY = "test-mock-api-key";
+
+  try {
+    // Use ultra-short timeout of 1ms to force immediate timeout
+    const result = await parseTransactionWithGemini({
+      text: "Spent 500 on groceries",
+      timeoutMs: 1,
+    });
+
+    assert.equal(result.success, true);
+    assert.equal(result.source, "fallback");
+    assert.equal(result.draft.amount, 500);
+    assert.equal(result.draft.needsReview, true);
+    assert.ok(result.diagnostics, "Diagnostics must be attached");
+    assert.equal(result.diagnostics.timedOut, true, "timedOut flag must be true");
+    assert.equal(result.diagnostics.httpStatus, 504, "HTTP status must be 504 for timeout");
+    assert.equal(result.diagnostics.providerCode, "REQUEST_TIMEOUT");
+  } finally {
+    if (originalKey !== undefined) {
+      process.env.GEMINI_API_KEY = originalKey;
+    } else {
+      delete process.env.GEMINI_API_KEY;
+    }
+  }
+});
+
+test("Regular Add Transaction Dialog and Form remain completely independent of Gemini", () => {
+  const formSource = readSource("src/components/transactions/AddTransactionDialog/add-transaction-form.tsx");
+  const dialogSource = readSource("src/components/transactions/AddTransactionDialog/add-transaction-dialog.tsx");
+
+  assert.ok(
+    !formSource.includes("@google/genai"),
+    "AddTransactionForm must not import @google/genai"
+  );
+  assert.ok(
+    !formSource.includes("gemini"),
+    "AddTransactionForm must remain independent of Gemini"
+  );
+  assert.ok(
+    !dialogSource.includes("@google/genai"),
+    "AddTransactionDialog must not import @google/genai"
+  );
+  assert.ok(
+    !dialogSource.includes("gemini"),
+    "AddTransactionDialog must remain independent of Gemini"
+  );
+});
+
+test("Parse route includes correlation ID, signal forwarding, and safe error masking", () => {
+  const routeSource = readSource("src/app/api/quick-add/parse/route.ts");
+
+  assert.ok(
+    routeSource.includes("requestId"),
+    "Route must generate and return correlation requestId"
+  );
+  assert.ok(
+    routeSource.includes("signal: req.signal"),
+    "Route must forward Next.js req.signal to prevent dangling requests"
+  );
+  assert.ok(
+    routeSource.includes("status: 499"),
+    "Route must handle client cancellation with HTTP 499"
+  );
+  assert.ok(
+    !routeSource.includes("err.stack"),
+    "Route must never leak internal stack traces"
   );
 });
 
